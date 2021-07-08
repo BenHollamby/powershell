@@ -20,6 +20,31 @@ function Get-OrganisationDetails {
 
 function Set-OrganisationDetails {
     
-    
+    $response = Read-Host -Prompt "Would you like to also change the organisation name?"
+
+    if ($response -eq 'yes') {
+
+        $name_entered = Read-Host -Prompt "Who is now the registered owner?"
+
+        $org_entered = Read-Host -Prompt "What is the organisation name?"
+
+        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
+        -Name RegisteredOwner -Value $name_entered
+
+        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
+        -Name RegisteredOrganization -Value $org_entered
+
+        Get-OrganisationDetails
+
+    }else {
+        
+        $name_entered = Read-Host -Prompt "Who is now the registered owner?"
+
+        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
+        -Name RegisteredOwner -Value $name_entered
+
+        Get-OrganisationDetails
+
+    }
     
 }
