@@ -5,13 +5,18 @@
 
 function Get-OrganisationDetails {
 
+    param(
+        [Parameter()]
+        $ComputerName
+    )
+
     $owner = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -Name RegisteredOwner).RegisteredOwner
     $ownerstring = (Get-culture).TextInfo.ToTitleCase($owner)
 
     $org = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -Name RegisteredOrganization).RegisteredOrganization
     $orgstring = (Get-culture).TextInfo.ToTitleCase($org)
 
-    Write-Host -ForegroundColor Green "Owner of this machine is: $ownerstring `nOrganisation is: $orgstring"
+    Write-Host -ForegroundColor Green "Computer name: $env:COMPUTERNAME `nOwner of this machine is: $ownerstring `nOrganisation is: $orgstring"
 
 }
 
@@ -19,6 +24,14 @@ function Get-OrganisationDetails {
 # The output should show the computer name and the registered values.
 
 function Set-OrganisationDetails {
+
+    param(
+
+        [Parameter()]
+
+        $ComputerName
+        
+    )
     
     Do {
 
@@ -33,22 +46,19 @@ function Set-OrganisationDetails {
 
         $org_entered = Read-Host -Prompt "What is the organisation name?"
 
-        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
-        -Name RegisteredOwner -Value $name_entered
+        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -Name RegisteredOwner -Value $name_entered
 
-        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
-        -Name RegisteredOrganization -Value $org_entered
+        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -Name RegisteredOrganization -Value $org_entered
 
-        #Get-OrganisationDetails
+        Get-OrganisationDetails
 
     }else {
         
         $name_entered = Read-Host -Prompt "Who is now the registered owner?"
 
-        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
-        -Name RegisteredOwner -Value $name_entered
+        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -Name RegisteredOwner -Value $name_entered
 
-        #Get-OrganisationDetails
+        Get-OrganisationDetails
 
     }
     
