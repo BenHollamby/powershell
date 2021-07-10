@@ -20,7 +20,12 @@ function Get-OrganisationDetails {
 
 function Set-OrganisationDetails {
     
+    Do {
+
     $response = Read-Host -Prompt "Would you like to also change the organisation name?"
+
+    } until ($response -eq "yes" -or $response -eq "no")
+
 
     if ($response -eq 'yes') {
 
@@ -34,7 +39,7 @@ function Set-OrganisationDetails {
         Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
         -Name RegisteredOrganization -Value $org_entered
 
-        Get-OrganisationDetails
+        #Get-OrganisationDetails
 
     }else {
         
@@ -43,7 +48,7 @@ function Set-OrganisationDetails {
         Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' `
         -Name RegisteredOwner -Value $name_entered
 
-        Get-OrganisationDetails
+        #Get-OrganisationDetails
 
     }
     
