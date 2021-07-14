@@ -11,22 +11,35 @@ using a proper verb-noun naming convention. If you feel a bit more skilled,
 feel free to include error handling, parameter validation and pipeline input.
 #>
 
-function Convert-Temperature([string]$Celcius, [string]$Fahrenheit) { 
+function Convert-Temperature { 
+
+    Param
+    (
+        [parameter(Mandatory=$true,
+        ParameterSetName="Celcius")]
+        [Int]
+        $Celcius,
+
+        [parameter(Mandatory=$true,
+        ParameterSetName="Fahrenheit")]
+        [Int]
+        $Fahrenheit
+
+    )
 
     if ($Celcius -ne "") {
 
-        Write-Host -ForegroundColor Green "Yo what's up $Celcius"
+        $convert = ($Celcius*1.8)+32
 
-    } elseif ($Fahrenheit -ne "") {
-    
-    Write-Host -ForegroundColor Yellow "Yo what's up $Fahrenheit"
+        Write-host "$Celcius degrees celcius converted to fahrenheit is $convert"
+
+    }elseif ($Fahrenheit -ne "") {
+
+        $convert = ($Fahrenheit-32)/1.8
+        
+        Write-Host "$Fahrenheit degrees fahrenheit converted to celcius is $convert"
 
     }
-
 }
 
-($c*1.8)+32
 
-
-
-($f-32)/1.8
