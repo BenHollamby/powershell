@@ -4,9 +4,12 @@
 
     param (
         
+        [Parameter(Mandatory = $true)] 
         [string[]]$ComputerName,
 
-        [string]$ErrorLog = "logforerror"
+        [Parameter(Mandatory = $true)]
+        [string]$ErrorLog = "infolog.txt"
+
     )
 
     BEGIN {
@@ -44,3 +47,5 @@
 
     }
 }
+
+#Get-SystemInfo -ComputerName localhost, localhost
