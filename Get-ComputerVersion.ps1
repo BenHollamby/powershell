@@ -23,7 +23,10 @@ function Get-ComputerVersion {
     param (
 
         [Parameter(Mandatory=$true)]
-        [string[]]$ComputerName
+        [string[]]$ComputerName,
+
+        [string]$ErrorLogs = "C:\Temp\computerversionerrors.txt",
+        [switch]$LogErrors
 
     )
 
@@ -33,55 +36,94 @@ function Get-ComputerVersion {
 
     PROCESS {
 
+        Write-Verbose "Starting PROCESS Block"
+
         foreach ($computer in $ComputerName) {
 
-            $system = Get-WmiObject -Class Win32_ComputerSystem
+            Try {
+                
+                $keepgoing = $true
 
-            $bios   = Get-WmiObject -Class Win32_BIOS
+                $system = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $computer -ErrorAction Stop
 
-            $os     = Get-WmiObject -Class Win32_OperatingSystem
+            } Catch {
 
-            $PW     = $null
+                $keepgoing = $false
+
+                Write-Warning "$computer failed to connect"
+
+                if ($LogErrors) {
+
+                    $computer | Out-File $ErrorLogs -Append
+
+                    Write-Warning "Logged to $ErrorLogs"
+
+                    }
+                }
+
+            if ($keepgoing) {
+
+                Write-Verbose "Querying BIOS"
+
+                $bios   = Get-WmiObject -Class Win32_BIOS -ComputerName $computer
+
+                Write-Verbose "Querying OS"
+
+                $os     = Get-WmiObject -Class Win32_OperatingSystem -ComputerName $computer
+
+                $PW     = $null
             
-            if ($system.AdminPasswordStatus -eq 1) {
+                if ($system.AdminPasswordStatus -eq 1) {
                 
-                $PW = "Disabled"
+                    $PW = "Disabled"
                 
-                }
+                    Write-Verbose "Variable set to $PW"
+                                
+                    }
 
-            elseif ($system.AdminPasswordStatus -eq 2) {
+                elseif ($system.AdminPasswordStatus -eq 2) {
 
-                $PW = "Enabled"
+                    $PW = "Enabled"
 
-                }
+                    Write-Verbose "Variable set to $PW"
 
-            elseif ($system.AdminPasswordStatus -eq 3) {
+                    }
 
-                $PW = "NA"
+                elseif ($system.AdminPasswordStatus -eq 3) {
 
-                }
+                    $PW = "NA"
 
-            elseif ($system.AdminPasswordStatus -eq 4) {
+                    Write-Verbose "Variable set to $PW"
 
-                $PW = "Unknown"
+                    }
 
-                }
+                elseif ($system.AdminPasswordStatus -eq 4) {
+
+                    $PW = "Unknown"
+
+                    Write-Verbose "Variable set to $PW"
+
+                    }
         
-            $properties = @{'Computer'=$computer;
-                            'WorkGroup'=$system.Domain;
-                            'AdminPasswordStatus'=$PW;
-                            'Model'=$system.Model;
-                            'Manufacturer'=$system.Model;
-                            'Serial'=$bios.SerialNumber;
-                            'Version'=$os.Version;
-                            'Architecture'=$os.OSArchitecture
-                            }
+                $properties = @{'Computer'=$computer;
+                                'WorkGroup'=$system.Domain;
+                                'AdminPasswordStatus'=$PW;
+                                'Model'=$system.Model;
+                                'Manufacturer'=$system.Model;
+                                'Serial'=$bios.SerialNumber;
+                                'Version'=$os.Version;
+                                'Architecture'=$os.OSArchitecture
+                                }
 
-            $info = New-Object -TypeName PSObject -Property $properties
+                $info = New-Object -TypeName PSObject -Property $properties
 
-            Write-Output $info
+                Write-Output $info
 
-            }  
+                Write-Verbose "Ending script"
+
+            }
+
+        }  
 
     }
 

@@ -4,40 +4,79 @@
 
     param (
         
-        [Parameter(Mandatory = $true)] 
+        [Parameter(Mandatory = $True,
+                   ValueFromPipeline=$True,
+                   HelpMessage="Computer name or IP Address")]
+        [ValidateCount(1,10)]
+        [ValidateNotNullorEmpty()] 
         [string[]]$ComputerName,
 
-        [Parameter(Mandatory = $true)]
-        [string]$ErrorLog = "infolog.txt"
+        [string]$ErrorLog = "C:\Temp\infolog.txt",
+        [switch]$LogErrors
 
     )
 
     BEGIN {
 
-        Write-Output "Log name is $errorlog"
+        Write-Verbose "Error log will be $ErrorLog"
 
     }
 
     PROCESS {
 
+        if (Test-Path $ErrorLog) {
+
+            Remove-Item $ErrorLog
+        }
+
+        Write-Verbose "Beginning PROCESS block"
+
         foreach ($computer in $ComputerName) {
-        
-            $os = Get-WmiObject -Class Win32_OperatingSystem -ComputerName $computer
 
-            $comp = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $computer
+            Write-Verbose "Querying $computer"
 
-            $bios = Get-WmiObject -Class Win32_BIOS -ComputerName $computer
+            Try {
+                
+                $everything_ok = $true
 
-            $properties = @{'ComputerName'=$computer;
-                            'OSVersion'=$os.version;
-                            'SPVersion'=$os.servicepackmajorversion;
-                            'BIOSSerial'=$bios.serialnumber;
-                            'Manufacturer'=$comp.manufacturer;
-                            'Model'=$comp.model}
+                $os = Get-WmiObject -Class Win32_OperatingSystem -ComputerName $computer -ErrorAction Stop
 
-            $object = New-Object -TypeName PSObject -Property $properties
+            } Catch {
 
-            Write-Output $object
+                $everything_ok = $false
+
+                Write-Warning "$computer failed to connect"
+
+                if ($LogErrors) {
+
+                    $computer | Out-File $ErrorLog -Append
+
+                    Write-Warning "Logged to $ErrorLog"
+
+                    }
+
+            }
+
+            if ($everything_ok) {
+            
+                $comp = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $computer
+
+                $bios = Get-WmiObject -Class Win32_BIOS -ComputerName $computer
+
+                $properties = @{'ComputerName'=$computer;
+                                'OSVersion'=$os.version;
+                                'SPVersion'=$os.servicepackmajorversion;
+                                'BIOSSerial'=$bios.serialnumber;
+                                'Manufacturer'=$comp.manufacturer;
+                                'Model'=$comp.model}
+
+                Write-Verbose "WMI queries complete"
+
+                $object = New-Object -TypeName PSObject -Property $properties
+
+                Write-Output $object
+            
+            }
 
         }
 

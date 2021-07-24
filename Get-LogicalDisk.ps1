@@ -5,7 +5,10 @@
     param (
 
         [Parameter(Mandatory = $true)]
-        [string[]]$ComputerName
+        [string[]]$ComputerName,
+
+        [string]$ErrorLogs = "C:\Temp\LogicalDiskError.txt",
+        [switch]$LogErrors
 
         )
 
@@ -16,21 +19,45 @@
     PROCESS {
 
         foreach ($computer in $ComputerName) {
+
+        Try {
         
-        $disk = Get-WmiObject -Class Win32_LogicalDisk
+            $continue = $true
 
-        $properties = @{'FreeSpace'=$disk.FreeSpace / 1GB -as [int];
-                        'Drive'=$disk.DeviceID;
-                        'ComputerName'=$computer;
-                        'Size'=$disk.Size / 1GB -as [int]
-                        }
+            $disk = Get-WmiObject -Class Win32_LogicalDisk -ComputerName $computer -ErrorAction Stop
 
-        $object = New-Object -TypeName PSObject -Property $properties
+        } Catch {
 
-        Write-Output $object
-        
+            $continue = $false
+
+            Write-Warning "$computer failed to connect"
+
+            if ($LogErrors) {
+
+                $computer | Out-File $ErrorLogs -Append
+
+                Write-Warning "Logged to $ErrorLogs"
+
+            }
+
         }
-    }
+
+        if ($continue) {
+
+            $properties = @{'FreeSpace'=$disk.FreeSpace / 1GB -as [int];
+                            'Drive'=$disk.DeviceID;
+                            'ComputerName'=$computer;
+                            'Size'=$disk.Size / 1GB -as [int]
+                            }
+
+            $object = New-Object -TypeName PSObject -Property $properties
+
+            Write-Output $object
+
+        }
+        
+      }
+   }
 
     END {
 
