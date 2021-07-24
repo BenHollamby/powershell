@@ -8,9 +8,9 @@ function Get-RegistryItem {
             Mandatory = $True,
             ValueFromPipeline = $True
         )]
-        [string]$ComputerName,
+        [string[]]$ComputerName,
 
-        [string]$ErrorLogs = "C:\Temp\pserror.txt"
+        [string]$ErrorLogs = "C:\Temp\pserror.txt",
         [Switch]$LogErrors
 
     )
@@ -25,6 +25,8 @@ function Get-RegistryItem {
 
             Try {
 
+                $continue = $True
+
                 Invoke-Command -ComputerName $Computer -ScriptBlock {
 
                     $Keys = Get-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\'
@@ -33,9 +35,33 @@ function Get-RegistryItem {
 
             } Catch {
 
-                
+                $continue = $false
 
+                if ($LogErrors) {
+
+                    $Computer | Out-File $ErrorLogs -Append  
+
+                    write-warning "Failed to connect to $Computer, logged to $ErrorLogs"
+
+                }
+                  
             }
+
+            if ($continue) {
+
+                $properties = @{'ComputerName'=$Computer;
+                                'Protocol'=$Keys.SecureProtocols;
+                                'Hive'=$Keys.PSDrive;
+                                'Child'=$Keys.PSChildName
+                                }
+
+                $object = New-Object -TypeName psobject -Property $properties
+
+                Write-Output $object
+
+            }    
+
+        
 
         }
 
