@@ -13,8 +13,7 @@ Parameters not showing up! Comeback to this tomorrow!
 
 function Set-ComputerState {
 
-    [cmdletbinding(SupportShouldProcess = $True,
-                   ConfirmImpact='High')]
+    [cmdletbinding()]
 
     param (
 
@@ -22,6 +21,8 @@ function Set-ComputerState {
                    ValueFromPipeline = $True)]
         [string[]]$ComputerName,
 
+        [Parameter(Mandatory = $True,
+                   ValueFromPipeline = $True)]
         [ValidateNotNullorEmpty()] 
         [ValidateSet(0, 1, 2, 8)]
         [int]$Action,
