@@ -13,20 +13,23 @@ Parameters not showing up! Comeback to this tomorrow!
 
 function Set-ComputerState {
 
-    [cmdletbinding()]
+    [cmdletbinding(SupportsShouldProcess = $True)]
 
     param (
 
         [Parameter(Mandatory = $True,
-                   ValueFromPipeline = $True)]
+                   ValueFromPipeline = $True,
+                   Position = 0)]
         [string[]]$ComputerName,
 
         [Parameter(Mandatory = $True,
-                   ValueFromPipeline = $True)]
+                   Position = 1)]
         [ValidateNotNullorEmpty()] 
         [ValidateSet(0, 1, 2, 8)]
         [int]$Action,
 
+        [Parameter(Mandatory = $False,
+                   Position = 1)]
         [string]$ForceShutdown,
         [switch]$Force
         
@@ -44,9 +47,12 @@ function Set-ComputerState {
 
                 if ($Force) {
 
-                    Write-Verbose "Forcing Shutdown"
+                    Write-Verbose "Forcing Shutdown" 
 
-                    (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(4)
+                    if ($PSCmdlet.ShouldProcess($Force, "Computer will be forced to shutdown")) {
+
+                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(4)
+                    }
 
                 } 
                 
@@ -54,7 +60,11 @@ function Set-ComputerState {
 
                     Write-Verbose "Logging off user on $Computer"
 
-                    (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(0)
+                    if ($PSCmdlet.ShouldProcess($Action,"User will be logged off")) {
+
+                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(0)
+
+                    }
 
                 }
 
@@ -62,7 +72,11 @@ function Set-ComputerState {
 
                     Write-Verbose "Restarting $Computer"
 
-                    (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(1)
+                    if ($PSCmdlet.ShouldProcess($Action, "Computer will restart")) {
+
+                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(1)
+
+                    }
 
                 }
 
@@ -70,31 +84,35 @@ function Set-ComputerState {
 
                     Write-Verbose "Shutting down $Computer"
 
-                    (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(2)
+                    if ($PSCmdlet.ShouldProcess($Action, "Computer will shutdown")) {
+
+                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(2)
                     
-                  
+                    }
+
                 }
 
                 elseif ($Action -eq 8) {
 
                     Write-Verbose "Powering off $Computer"
 
-                    (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(8)
+                    if ($PSCmdlet.ShouldProcess($Action, "WARNING: Computer will power off")) {
+
+                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(8)
+
+                    }
 
                 }
 
-                
-        }
+            } Catch {
 
-        Catch {
-
-            Write-Warning "Error!!!"
+            Write-Warning "Error!!"
 
             }
+                
+        } 
 
-    }
-
-}
+    } 
 
     END {
 
