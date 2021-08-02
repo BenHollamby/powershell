@@ -52,6 +52,6 @@ $users = Get-Content C:\Temp\nzusers.txt
 
 foreach ($user in $users) {
 
-    Set-MailboxRegionalConfiguration -Identity $user -Language en-NZ -DateFormat d/MM/yyyy -TimeFormat "HH:mm" -TimeZone "New Zealand Standard Time" -WhatIf
+    Set-MailboxRegionalConfiguration -Identity $user -Language en-NZ -DateFormat d/MM/yyyy -TimeFormat "HH:mm" -TimeZone "New Zealand Standard Time"
 
     }
