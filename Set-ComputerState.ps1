@@ -56,49 +56,53 @@ function Set-ComputerState {
 
                 } 
                 
-                elseif ($Action -eq 0) {
+                elseif ($Action) {
+                
+                    if ($Action -eq 0) {
 
-                    Write-Verbose "Logging off user on $Computer"
+                        Write-Verbose "Logging off user on $Computer"
 
-                    if ($PSCmdlet.ShouldProcess($Action,"User will be logged off")) {
+                        if ($PSCmdlet.ShouldProcess($Action,"User will be logged off")) {
 
-                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(0)
+                            (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(0)
 
-                    }
-
-                }
-
-                elseif ($Action -eq 1) {
-
-                    Write-Verbose "Restarting $Computer"
-
-                    if ($PSCmdlet.ShouldProcess($Action, "Computer will restart")) {
-
-                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(1)
+                        }
 
                     }
 
-                }
+                    elseif ($Action -eq 1) {
 
-                elseif ($Action -eq 2) {
+                        Write-Verbose "Restarting $Computer"
 
-                    Write-Verbose "Shutting down $Computer"
+                        if ($PSCmdlet.ShouldProcess($Action, "Computer will restart")) {
 
-                    if ($PSCmdlet.ShouldProcess($Action, "Computer will shutdown")) {
+                            (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(1)
 
-                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(2)
+                        }
+
+                    }
+
+                    elseif ($Action -eq 2) {
+
+                        Write-Verbose "Shutting down $Computer"
+
+                        if ($PSCmdlet.ShouldProcess($Action, "Computer will shutdown")) {
+
+                            (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(2)
                     
+                        }
+
                     }
 
-                }
+                    elseif ($Action -eq 8) {
 
-                elseif ($Action -eq 8) {
+                        Write-Verbose "Powering off $Computer"
 
-                    Write-Verbose "Powering off $Computer"
+                        if ($PSCmdlet.ShouldProcess($Action, "WARNING: Computer will power off")) {
 
-                    if ($PSCmdlet.ShouldProcess($Action, "WARNING: Computer will power off")) {
+                            (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(8)
 
-                        (Get-WmiObject -ComputerName $Computer -Class Win32_operatingsystem).Win32Shutdown(8)
+                        }
 
                     }
 
