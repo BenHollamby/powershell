@@ -105,7 +105,7 @@ function Get-ComputerVersion {
 
                     }
         
-                $properties = @{'Computer'=$computer;
+                [PSCustomObject] @{'Computer'=$computer;
                                 'WorkGroup'=$system.Domain;
                                 'AdminPasswordStatus'=$PW;
                                 'Model'=$system.Model;
@@ -115,9 +115,9 @@ function Get-ComputerVersion {
                                 'Architecture'=$os.OSArchitecture
                                 }
 
-                $info = New-Object -TypeName PSObject -Property $properties
+                #$info = New-Object -TypeName PSObject -Property $properties
 
-                Write-Output $info
+                #Write-Output $info
 
                 Write-Verbose "Ending script"
 
