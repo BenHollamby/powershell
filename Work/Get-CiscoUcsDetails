@@ -1,0 +1,106 @@
+function Get-CiscoUcsDetails {
+
+    [cmdletbinding()]
+
+    param (
+
+    )
+
+    BEGIN {
+
+        $UCSServers = ""
+        $Credential = Get-Credential
+
+    }
+
+    PROCESS {
+
+        foreach ($UCSServer in $UCSServers) {
+
+            Write-Verbose "Attempting to connect to $UCSServer"
+
+            Try {
+
+                Connect-Ucs -Name $UCSServer -Credential $Credential -ErrorAction Stop | Out-Null
+
+            }
+
+            Catch {
+
+                Write-Output "Check connection via web browser"
+
+            }
+
+            Write-Host -ForegroundColor Green "Listing any faults on $UCSServer"
+
+            $Faults = Get-UcsFault | Where-Object {$_.Severity -ne "cleared"}
+
+            foreach ($Fault in $Faults) {
+
+                if ($Fault.highestseverity -eq "Critical") {
+
+                    Write-Host -ForegroundColor Red "CRITICAL ALERT FOR"
+
+                    [PSCustomObject] @{
+
+                        Created      = $Fault.Created
+                        Acknowledged = $Fault.Ack
+                        Severity     = $Fault.highestseverity
+                        Cause        = $Fault.Cause
+                        Description  = $Fault.Descr
+                        Type         = $Fault.Type
+                        Dn           = $Fault.Dn
+
+                    }
+
+                }
+
+                elseif ($Fault.highestseverity -eq "Major") {
+
+                    Write-Host -ForegroundColor Yellow "MAJOR ALERT FOR"
+
+                    [PSCustomObject] @{
+
+                        Created      = $Fault.Created
+                        Acknowledged = $Fault.Ack
+                        Severity     = $Fault.highestseverity
+                        Cause        = $Fault.Cause
+                        Description  = $Fault.Descr
+                        Type         = $Fault.Type
+                        Dn           = $Fault.Dn
+
+                    }
+
+                }
+
+                elseif ($Fault.highestseverity -eq "Info") {
+
+                    Write-Host -ForegroundColor Gray "INFORMATION ALERT FOR"
+
+                    [PSCustomObject] @{
+
+                        Created      = $Fault.Created
+                        Acknowledged = $Fault.Ack
+                        Severity     = $Fault.highestseverity
+                        Cause        = $Fault.Cause
+                        Description  = $Fault.Descr
+                        Type         = $Fault.Type
+                        Dn           = $Fault.Dn
+
+                    }
+
+                }
+
+            }
+
+            $Disconnect = Disconnect-Ucs | Out-Null
+
+        }
+
+    }
+
+    END {
+
+    }
+
+}
