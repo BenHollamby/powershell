@@ -1,0 +1,166 @@
+function Get-NetAppInformation {
+
+<#
+
+.SYNOPSIS
+Get NetApp SAN information.
+
+.DESCRIPTION
+This command queries  then .
+
+It first queries the aggregates and only will list Tier 0 and Tier 1 and ignores everything else
+and lists its state whether online or offline. The size and available size in TB and used size in %.
+
+It then queries the Volumes ignoring all boot volumes. If the volume is offline or the volume is 
+over 80% it will list as a warning.
+
+It then queries the LUN, ignoring all boot volumes. If the LUN is offline or the LUN is over 80% capacity, 
+it will list as a warning.
+
+It will then check replication. If the snapmirror state does not equal snapmirrored, or the
+snapmirror IsHealthy does not equal True, the snapmirror will list as a warning.
+
+
+.EXAMPLE
+PS C:\> Get-NetAppInformation
+
+ is the active server
+
+Getting Hyper-V hosts
+
+Checking Virtual Machine status
+WARNING:  is listed as having IncompleteVMConfig
+WARNING:  is listed as having IncompleteVMConfig
+
+#>
+
+    [cmdletbinding()]
+
+    param (
+
+        #Nothing here yet
+        
+    )
+
+    BEGIN {
+
+       $SANS = " "
+
+       $Credential = Get-Credential 
+
+    }
+
+    PROCESS {
+
+        foreach ($SAN in $SANS) {
+            
+            Write-Output " "
+            Write-Verbose "Attempting connection to $SAN"
+            Write-Host -ForegroundColor Yellow "$SAN"
+
+            Try {
+            
+                Connect-NcController -Name $SAN -Credential $Credential -HTTPS -ErrorAction Stop
+
+            } Catch {
+
+                Write-Output "$SAN unavailable, check in webbrowser"
+
+            }
+
+            Write-Verbose "Connection Established"
+            Write-Output " "
+            Write-Host -ForegroundColor Yellow "Getting Aggregate Information"
+
+            $Aggregates = Get-NcAggr 
+
+            foreach ($Aggregate in $Aggregates) {
+
+                Write-Host -ForegroundColor Green "AGGREGATE $Aggregate :"
+
+                [PSCustomObject] @{
+              
+                    "   State"         = $Aggregate.State
+                    "   TotalSize(TB)" = ($Aggregate.TotalSize / 1tb).ToString(".00")
+                    "   TotalUsed(%)"  = ($Aggregate.Used)
+                    "   Available(TB)" = ($Aggregate.Available / 1tb).ToString(".00")
+
+                }
+
+            }
+        
+            Write-Host -ForegroundColor Yellow "Getting Volume Information, lists only volumes offline or greater than 80%"
+
+            $Volumes = Get-NcVol 
+
+            Write-Output " "
+
+            foreach ($Volume in $Volumes) {
+
+                if ($Volume.state -ne "online") {
+
+                    Write-Warning "$Volume offline!"
+
+                } elseif ($Volume.Used -gt "80") {
+
+                    Write-Warning "$Volume over 80%!"
+
+                }
+
+            }
+
+            Write-Verbose "Finished checking Volumes"
+            Write-Output " "
+            Write-Host -ForegroundColor Yellow "Checking LUNS, lists only if offline or greater that 80%"
+
+            $Luns = Get-NcLun 
+
+            foreach ($Lun in $Luns) {
+
+                $Size = $Lun.Size / 1gb -as [int]
+                $Used = $Lun.SizeUsed / 1gb -as [int]
+
+                if ((($Used / $Size).ToString("P")) -gt "80") {
+
+                    Write-Warning "$Lun is greater than 80%!"
+
+                } elseif ($lun.online -ne "True") {
+
+                    Write-Warning "$Lun is offline!"
+
+                }
+
+            }
+
+            Write-Verbose "Finished checking Luns"
+            Write-Output " "
+            Write-host -ForegroundColor Yellow "Checking Replication"
+
+            $SnapMirrors = Get-NcSnapmirror
+
+            foreach ($SnapMirror in $SnapMirrors) {
+
+                if ($SnapMirror.MirrorState -ne "snapmirrored") {
+
+                    Write-Warning "$SnapMirror not snapmirrored!"
+
+                } elseif ($SnapMirror.IsHealthy -ne "True") {
+
+                    Write-Warning "$SnapMirror not in a healthy state!"
+
+                }
+
+            }
+            
+            Write-Output " "        
+            Write-Host -ForegroundColor Green "## Finished Checking $SAN ##"
+
+         }
+
+    }
+
+    END {
+
+    }
+
+}
