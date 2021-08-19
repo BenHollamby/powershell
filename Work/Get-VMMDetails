@@ -1,0 +1,143 @@
+function Get-VMMDetails {
+
+<#
+
+.SYNOPSIS
+Get System Center Virtual Machine Manager Host and VM information.
+
+.DESCRIPTION
+This command queries whether VMM host is currently active.
+Then queries each Hyper-V host and will return issues only if ComputerState,
+HyperVState, CommunicationState, or OverallState is not OK. It will list the
+host and which state is not ok.
+Then the command queries each Virtual machine. If the VM is powered off and 
+the name of the VM does not start with OFF, it will list as the VM as being powered off
+and will also list the host that it is on.
+If the VM status is listed with one of the following, IncompleteVMConfig,
+HostnotResponding, or UnderMigration it will list the VM, which host it is on and the 
+status it current has. (Will need to update as more states are discovered, or a catch all
+of some kind for anything that is not "running".
+
+.EXAMPLE
+PS C:\> Get-VMMDetails
+
+[] is the active server
+
+Getting Hyper-V hosts
+
+Checking Virtual Machine status
+WARNING: [] is listed as having IncompleteVMConfig
+WARNING: [] is listed as having IncompleteVMConfig
+
+#>
+
+    [cmdletbinding()]
+
+    param (
+
+    )
+
+    BEGIN {
+
+        Write-Verbose "Verifying which host is live"
+
+        $Servers = ""
+
+        foreach ($Server in $Servers) {
+
+            Try {
+            
+                $VMManager = Get-SCVMMServer -ComputerName $Server -ErrorAction Stop
+
+            } Catch [Microsoft.VirtualManager.Utils.CarmineException] {
+
+              }
+
+        }
+
+        $Active = $VMManager.Name
+        Write-Output "$Active is the active server"
+
+    }
+
+    PROCESS {
+
+        Write-Verbose "Attempting to gather all Hyper-V hosts, checking Computer State, HyperVState, CommunicationState, and OverallState"
+        Write-Host " "
+        Write-Host -ForegroundColor Yellow "Checking Hyper-V hosts. Blank if no issues with ComputerState, HyperVState, CommunicationState, or OverallState."
+
+        $HyperVHosts = Get-SCVMHost
+
+        foreach ($HyperVHost in $HyperVHosts) {
+
+            if ($HyperVHost.ComputerState -ne "Responding") {
+            
+                Write-Warning "$HyperVHost ComputerState not responding"
+
+            }
+            
+            elseif ($HyperVHost.HyperVState -ne "Running") {
+            
+                Write-Warning "$HyperVHost HyperVState not running"
+
+            }
+            
+            elseif ($HyperVHost.CommunicationState -ne "Responding") {
+            
+                Write-Warning "$HyperVHost CommunicationState not responding"
+
+            }
+
+            elseif ($HyperVHost.OverallState -ne "OK") {
+
+                Write-Warning "$HyperVHost OverallState is not OK"
+
+            }
+
+        }
+
+        Write-Verbose "Checking all virtual machines"
+        Write-Host " "
+        Write-Host -ForegroundColor Yellow "Checking Virtual Machine status, blank if no issues with status equal to Running. Will list VM's that are turned off without their name beginning with off."
+
+        $VirtualMachines = Get-SCVirtualMachine
+
+        foreach ($VirtualMachine in $VirtualMachines) {
+
+            $hostname = $VirtualMachine.hostname
+
+            if ($VirtualMachine.Status -eq "PowerOFf" -and $VirtualMachine.Name -notlike "Off*") {
+
+                Write-Warning "$VirtualMachine on $hostname is turned off"
+            } 
+    
+            elseif ($VirtualMachine.Status -eq "IncompleteVMConfig") {
+
+                Write-Warning "$VirtualMachine on $hostname is listed as having IncompleteVMConfig"
+
+            }
+
+            elseif ($VirtualMachine.Status -eq "HostnotResponding") {
+
+                
+                Write-Warning "$VirtualMachine's host not responding, check $hostname for issues"
+
+            }
+
+            elseif ($VirtualMachine.Status -eq "UnderMigration") {
+
+                Write-Warning "$VirtualMachine on $hostname is under migration"
+
+            }
+
+            #What other states can a SCVM be in?
+
+        }
+
+    }
+
+    END {
+
+    }
+
+}
