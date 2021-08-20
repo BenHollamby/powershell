@@ -1,4 +1,85 @@
-function Get-CiscoUcsDetails {
+function Get-CiscoUCSDetails {
+
+<#
+
+.SYNOPSIS
+Get Cisco UCS Faults.
+
+.DESCRIPTION
+This command queries [] then [] for Faults that have do not have a 
+severity 'cleared' flag.
+
+For Critical Faults, it will list "Critical Fault for []" in red.
+For Major Faults, it will list "Major Fault for []" in yellow.
+For Minor Faults, it will list "Minor Fault for []" in blue.
+For Information Faults, it wil list "Information Fault for []" in white.
+
+Each fault will then list the following information:
+When the fault was Created.
+If the fault has been Acknowledged.
+The highest Severity rating.
+The Cause of the fault.
+A Description of the fault.
+The Type of fault.
+And the Dn (Distinct Name) of the fault.
+
+
+.EXAMPLE
+PS C:\> Get-CiscoUCSDetails
+
+Listing any faults on 
+INFORMATION ALERT FOR 
+
+
+Created      : 2021-07-27T11:31:44.809
+Acknowledged : no
+Severity     : info
+Cause        : log-capacity
+Description  : Log capacity on Management Controller on server 4/1 is very-low
+Type         : operational
+Dn           : sys/chassis-4/blade-1/mgmt/log-SEL-0/fault-F0461
+
+CRITICAL ALERT FOR
+Created      : 2021-07-27T11:32:52.420
+Acknowledged : no
+Severity     : critical
+Cause        : power-problem
+Description  : Motherboard of server 4/2 (service profile: ) power: failed
+Type         : environmental
+Dn           : sys/chassis-4/blade-2/board/fault-F0868
+
+MAJOR ALERT FOR 
+Created      : 2021-07-27T11:32:52.419
+Acknowledged : no
+Severity     : major
+Cause        : power-problem
+Description  : Server 4/2 (service profile: ) oper state: inoperable
+Type         : environmental
+Dn           : sys/chassis-4/blade-2/fault-F0311
+
+MAJOR ALERT FOR 
+Created      : 2021-07-27T11:44:15.810
+Acknowledged : no
+Severity     : major
+Cause        : discovery-failed
+Description  : Server 4/2 (service profile: ) discovery: failed
+Type         : operational
+Dn           : sys/chassis-4/blade-2/fault-F0314
+
+CRITICAL ALERT FOR
+Created      : 2021-07-27T11:44:15.808
+Acknowledged : no
+Severity     : critical
+Cause        : fsm-failed
+Description  : [FSM:FAILED]: blade discovery 4/2(FSM:sam:dme:ComputeBladeDiscover). Remote-Invocation-Error: Unable to 
+               change server power state-MC Error(-20): Management controller cannot or failed in processing request
+Type         : fsm
+Dn           : sys/chassis-4/blade-2/fault-F999560
+
+Listing any faults on []
+
+
+#>
 
     [cmdletbinding()]
 
@@ -57,7 +138,7 @@ function Get-CiscoUcsDetails {
 
                 elseif ($Fault.highestseverity -eq "Major") {
 
-                    Write-Host -ForegroundColor Yellow "MAJOR ALERT FOR"
+                    Write-Host -ForegroundColor Yellow "MAJOR ALERT FOR $UCSServer"
 
                     [PSCustomObject] @{
 
@@ -73,9 +154,26 @@ function Get-CiscoUcsDetails {
 
                 }
 
+                elseif ($Fault.highestseverity -eq "minor") {
+
+                    Write-Host -ForegroundColor Blue "MINOR ALERT FOR $UCSServer"
+
+                    [PSCustomObject] @{
+
+                        Created      = $Fault.Created
+                        Acknowledged = $Fault.Ack
+                        Severity     = $Fault.highestseverity
+                        Cause        = $Fault.Cause
+                        Description  = $Fault.Descr
+                        Type         = $Fault.Type
+                        Dn           = $Fault.Dn
+
+                    }
+                }
+
                 elseif ($Fault.highestseverity -eq "Info") {
 
-                    Write-Host -ForegroundColor Gray "INFORMATION ALERT FOR"
+                    Write-Host -ForegroundColor White "INFORMATION ALERT FOR $UCSServer"
 
                     [PSCustomObject] @{
 
