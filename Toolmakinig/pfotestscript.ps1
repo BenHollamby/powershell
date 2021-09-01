@@ -24,7 +24,7 @@
 
         Try {
 
-            Write-Verbose "Attempting to connect to SQL Server"
+            Write-Verbose "Attempting to connect to Exchange Server"
             $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri [] -Authentication Kerberos -ErrorAction Stop
 
         } Catch {
