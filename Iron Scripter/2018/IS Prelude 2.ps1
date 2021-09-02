@@ -10,3 +10,103 @@ Your solution will be judged on:
 • Faction alignment 
 • Adherence to Iron Scripter rules
 #>
+
+function Move-SwarmUser {
+
+    [cmdletbinding()]
+
+    param (
+
+        [Parameter(Mandatory,
+                   ValueFromPipeline,
+                   Position=0)]
+        #[ValidateNotNullOrEmpty]
+        [string]$User,
+
+        [Parameter(Mandatory)]
+        [ArgumentCompleter({(Get-ADOrganizationalUnit -Filter * | Where-Object {$_.Name -like "*ZERO*"}).Name})]
+        [string]$OU
+
+    )
+
+    BEGIN {
+
+        Write-Verbose "Start of BEGIN block"
+        foreach ($U in $User) {
+
+            Try {
+                
+                Write-Verbose "Attempt to get AD User $U"
+                $SwarmUser = Get-ADUser $U -ErrorAction Stop
+
+            } 
+
+            Catch {
+
+                Write-Warning "Unable to find AD User. Check SamAccountName."
+
+            }
+
+            Write-Verbose "Attempting to set $OU Organisational Unit as a variable"
+            $SwarmUnit = Get-ADOrganizationalUnit -LDAPFilter "(name=$OU)"
+
+            Write-Verbose "If SwarmUnit variable has data, proceed variable set to true. Else set to false"
+            if ($SwarmUnit) {
+
+                $Proceed = $true
+
+            } else {
+
+                $Proceed = $false
+                Write-Warning "Variable is empty, please tab complete -OU"
+
+            }
+
+            if ($Proceed) {
+
+                Write-Verbose "Getting users from $OU"
+                $GetNewOUUser = Get-ADUser -Filter * -SearchBase $SwarmUnit.DistinguishedName
+
+                Write-Verbose "Getting the first user from $OU"
+                $LuckyUser = $GetNewOUUser[0]
+
+                Write-Verbose "Getting the groups $LuckyUser is a member of"
+                $UserGroups = Get-ADUser $LuckyUser -Properties MemberOf
+
+                Write-Verbose "Assigning all groups to Groups variable"
+                $Groups = $UserGroups.MemberOf
+
+                
+            }
+
+        }
+
+        Write-Verbose "End of BEGIN block"
+
+    }
+
+    PROCESS {
+
+        Write-Verbose "Start of PROCESS block"
+
+        Write-Verbose "Getting all groups $SwarmUser is a member of"
+        $SwarmUserGroups = Get-ADUser $SwarmUser -Properties MemberOf
+        
+        $SwarmUserGroups
+        #foreach ($SwarmUserGroup in $SwarmUserGroups) {
+
+            Get-ADGroup $
+            #Remove-ADGroupMember -Identity ($SwarmUserGroup).Name -Members $SwarmUser -Confirm:$false
+
+        #}
+        
+        Write-Verbose "Moving $SwarmUser to $OU"
+        #Get-ADUser $SwarmUser | Move-ADObject -TargetPath $SwarmUnit.DistinguishedName
+
+    }
+
+    END{
+
+    }
+
+}
