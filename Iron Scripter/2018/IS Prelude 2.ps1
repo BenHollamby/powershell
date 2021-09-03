@@ -90,22 +90,31 @@ function Move-SwarmUser {
         Write-Verbose "Start of PROCESS block"
 
         Write-Verbose "Getting all groups $SwarmUser is a member of"
-        $SwarmUserGroups = Get-ADUser $SwarmUser -Properties MemberOf
+        $SwarmUserGroups = (Get-ADUser $SwarmUser -Properties MemberOf).MemberOf
         
-        $SwarmUserGroups
-        #foreach ($SwarmUserGroup in $SwarmUserGroups) {
+        foreach ($SwarmUserGroup in $SwarmUserGroups) {
+            
+            Write-Verbose "Removing $SwarmUser from $ $SwarmUserGroup"
+            Remove-ADGroupMember -Identity $SwarmUserGroup -Members $SwarmUser -Confirm:$false
 
-            Get-ADGroup $
-            #Remove-ADGroupMember -Identity ($SwarmUserGroup).Name -Members $SwarmUser -Confirm:$false
+        }
 
-        #}
+        Write-Verbose "Adding groups to $SwarmUser"
+        foreach ($Group in $Groups) {
+
+            Write-Verbose "Adding $SwarmUser to $Group"
+            Add-ADGroupMember -Identity $Group -Members $SwarmUser
+
+        }
         
         Write-Verbose "Moving $SwarmUser to $OU"
-        #Get-ADUser $SwarmUser | Move-ADObject -TargetPath $SwarmUnit.DistinguishedName
+        
+        
+        Get-ADUser $SwarmUser | Move-ADObject -TargetPath "$SwarmUnit"
 
     }
 
-    END{
+    END {
 
     }
 
