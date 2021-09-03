@@ -108,9 +108,9 @@ function Move-SwarmUser {
         }
         
         Write-Verbose "Moving $SwarmUser to $OU"
-        
-        
-        Get-ADUser $SwarmUser | Move-ADObject -TargetPath "$SwarmUnit"
+        $SwarmUserName = $SwarmUser.toString()
+        $SwarmUnitName = $SwarmUnit.toString()
+        Move-ADObject -Identity $SwarmUserName -TargetPath $SwarmUnitName
 
     }
 
