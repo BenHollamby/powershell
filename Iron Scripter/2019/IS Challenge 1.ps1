@@ -41,6 +41,7 @@ SERVER01     memory                                                      cache f
 SERVER01     physicaldisk(_total)                                        % disk time               0.06629201377444
 SERVER01     physicaldisk(_total)                                        current disk queue length                0
 #>
+
 function Get-SwarmCounters {
 
    [CmdletBinding()]
@@ -55,6 +56,7 @@ function Get-SwarmCounters {
    if ($Counters) {
 
        $items = $Counters.CounterSamples
+       $Time = $Counters.Timestamp
 
        foreach ($item in $items) {
 
@@ -74,6 +76,7 @@ function Get-SwarmCounters {
                CounterSet = "$CounterSet"
                Counter    = "$Counter"
                Value      = "$Value"
+               TimeStamp  = "$Time"
 
            }
 
@@ -84,6 +87,7 @@ function Get-SwarmCounters {
    else {
 
        $counters = (Get-Counter).CounterSamples
+       $Time = (Get-Counter).Timestamp
 
        foreach ($counter in $counters) {
 
@@ -103,6 +107,7 @@ function Get-SwarmCounters {
                CounterSet = "$CounterSet"
                Counter    = "$Counter"
                Value      = "$Value"
+               TimeStamp  = "$Time"
 
            }
 
