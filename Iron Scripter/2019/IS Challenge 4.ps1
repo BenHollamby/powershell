@@ -1,8 +1,13 @@
 <#
-The Chairman is very taken with the idea of automation and deployment pipelines. He is intrigued by all of the options available to IT Pros and his Iron Scripters. To that end, he is proposing this warm-up challenge to continue preparing you for the Iron Scripter event at the upcoming PowerShell + DevOps Global Summit.
+The Chairman is very taken with the idea of automation and deployment pipelines. 
+He is intrigued by all of the options available to IT Pros and his Iron Scripters.
+ To that end, he is proposing this warm-up challenge to continue preparing you for 
+ the Iron Scripter event at the upcoming PowerShell + DevOps Global Summit.
 
 The Challenge
-Using Azure, AWS or any virtualization technology you prefer, i.e. VMware or Hyper-V, create a PowerShell solution you can initiate from a PowerShell prompt to create and start a virtual machine that meets the following configuration criteria:
+Using Azure, AWS or any virtualization technology you prefer, i.e. VMware or Hyper-V, 
+create a PowerShell solution you can initiate from a PowerShell prompt to create and 
+start a virtual machine that meets the following configuration criteria:
 
 Requirements
 System event log size set to 2GB
@@ -22,7 +27,9 @@ Install the PSScriptTools module from the PowerShell Gallery
 Other than manually initiating the process, this should be a completely hands-free experience.
 
 Comments
-You don’t have to necessarily create the virtual machine entirely from scratch using PowerShell. It is perfectly acceptable to assume you have some sort of baseline server image that you can launch and configure. Using a container may be another option.
+You don’t have to necessarily create the virtual machine entirely from scratch using PowerShell.
+ It is perfectly acceptable to assume you have some sort of baseline server image that you can 
+ launch and configure. Using a container may be another option.
 
 Good Automating!
 #>
