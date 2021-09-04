@@ -41,3 +41,73 @@ SERVER01     memory                                                      cache f
 SERVER01     physicaldisk(_total)                                        % disk time               0.06629201377444
 SERVER01     physicaldisk(_total)                                        current disk queue length                0
 #>
+function Get-SwarmCounters {
+
+   [CmdletBinding()]
+
+   param (
+
+       [Parameter(ValueFromPipeline)]
+       [PSObject[]] $Counters
+
+   )
+
+   if ($Counters) {
+
+       $items = $Counters.CounterSamples
+
+       foreach ($item in $items) {
+
+           $Path = $item.Path
+           $InstanceName = $item.InstanceName
+           $Value = $item.CookedValue
+
+           $SplitPath = $Path.Split("\\""\")
+           $PathItems = $SplitPath | Where-Object {$_ -ne ""}
+           $Computer = $PathItems[0]
+           $CounterSet = $PathItems[1]
+           $Counter = $PathItems[2]
+
+           [PSCustomObject] @{
+
+               Computer   = "$Computer"
+               CounterSet = "$CounterSet"
+               Counter    = "$Counter"
+               Value      = "$Value"
+
+           }
+
+       }
+
+   }
+
+   else {
+
+       $counters = (Get-Counter).CounterSamples
+
+       foreach ($counter in $counters) {
+
+           $Path = $counter.Path
+           $InstanceName = $counter.InstanceName
+           $Value = $counter.CookedValue
+
+           $SplitPath = $Path.Split("\\""\")
+           $PathItems = $SplitPath | Where-Object {$_ -ne ""}
+           $Computer = $PathItems[0]
+           $CounterSet = $PathItems[1]
+           $Counter = $PathItems[2]
+
+           [PSCustomObject] @{
+
+               Computer   = "$Computer"
+               CounterSet = "$CounterSet"
+               Counter    = "$Counter"
+               Value      = "$Value"
+
+           }
+
+       }
+
+   }
+
+}
