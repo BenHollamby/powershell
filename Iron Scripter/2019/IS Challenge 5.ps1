@@ -21,3 +21,8 @@ Your goal is to find the values in $List that do not match anything in $Target.
 
 Good Luck and check back later for a suggested solution.
 #>
+
+$target = "Spooler", "Spork Client", "WinRM", "Spork Agent Service", "BITS","WSearch"
+$list   = "winrm", "foo", "spooler", "spor*", "bar"
+
+$list | Where-Object {(-not($target -like $_))}
