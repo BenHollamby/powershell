@@ -1,218 +1,120 @@
 <#
-You’re required to produce a function to move AD user accounts between OUs. The user should have their current 
-group memberships removed and be added to the groups of the other users in the OU. Assume that all users in the 
-OU will have the same group membership. 
-Any user that hasn’t logged on for more than 90 days should be moved to a holding OU BUT should retain their 
-group memberships. These accounts should be disabled.
-Your solution will be judged on:
+You’re required to create a function that generates a string of random characters of a given length.
+You’re required to create a function that generates a string of random characters of a given Number.
+The string must contain a given number of non-alphanumeric characters –
+the rest can be numbers or letters (at least one upper 
+case, at least one lower case character and at least 1 numeric character).
+The length of the string and the number of 
+The Number of the string and the number of 
+non-alphanumeric characters must be under the users control.
 #>
 
-function Move-SwarmUser {
+function Get-RandomString {
 
     <#
     .SYNOPSIS
-    Move-SwarmUser will move a user, and change the groups based on the OU you select.
-    
+    Get-RandomString will generate a random string of normal and special characters
     .DESCRIPTION
-    Move-SwarmUser is a function to move AD user accounts between OUs. The user should have their current 
-    group memberships removed and be added to the groups of the other users in the OU. Assume that all users in the 
-    OU will have the same group membership. 
-    Any user that hasn’t logged on for more than 90 days should be moved to a holding OU BUT should retain their 
-    group memberships. These accounts should be disabled.
-    
-    .PARAMETER User
+    Get-RandomString takes a mandatory input of Number which specifies how many characters
+    to generate. With just the Number parameter it will produce a string with normal
+    and special characters.
+    With the Specials parameter, users can specify how many special characters are
+    required in the string
+    .PARAMETER Number
     Mandatory
-    SamAccountName works best
-    
-    .PARAMETER OU
-    Mandatory
-    Tab select to complete
-    
+    Accepts value from pipeline
+    Determines how many characters will be in the string
+    .PARAMETER Specials
+    Optional
+    Determines how many special characters required in the string.
     .EXAMPLE
-    Move-SwarmUser -User dronesix -OU OUZEROONE
-    
+    Get-RandomString -Number 10 -Specials 9
+    <&:)_!@j:?
     #>
     
-    
-        [cmdletbinding(SupportsShouldProcess)]
+        [cmdletbinding()]
     
         param (
     
             [Parameter(Mandatory,
-                       Position=0)]
-            #[ValidateNotNullOrEmpty]
-            [string]$User,
+                       ValueFromPipeline)]
+            [int]$Number,
     
-            [Parameter(Mandatory)]
-            [ArgumentCompleter({(Get-ADOrganizationalUnit -Filter * | Where-Object {$_.Name -like "*ZERO*"}).Name})]
-            [string]$OU
+            [int]$Specials
     
         )
     
-        BEGIN {
+        $Count = 0
     
-            Write-Verbose "Start of BEGIN block"
-            foreach ($U in $User) {
+        $SCharacters = ""
     
-                Try {
-                    
-                    Write-Verbose "Attempt to get AD User $U"
-                    $SwarmUser = Get-ADUser $U -ErrorAction Stop
+        while ($Count -ne $Number) {
     
-                } 
+            foreach($l in $Number) {
     
-                Catch {
+                $Count += 1
     
-                    Write-Warning "Unable to find AD User. Check SamAccountName."
+                $Characters = 33..126
+                $Random = Get-Random $Characters
+                $string = [char]$Random
     
-                }
-    
-                Write-Verbose "Attempting to set $OU Organisational Unit as a variable"
-                $SwarmUnit = Get-ADOrganizationalUnit -LDAPFilter "(name=$OU)"
-    
-                Write-Verbose "If SwarmUnit variable has data, proceed variable set to true. Else set to false"
-                if ($SwarmUnit) {
-    
-                    $Proceed = $true
-    
-                } else {
-    
-                    $Proceed = $false
-                    Write-Warning "Variable is empty, please tab complete -OU"
-    
-                }
-    
-                if ($Proceed) {
-    
-                    Write-Verbose "Getting users from $OU"
-                    $GetNewOUUser = Get-ADUser -Filter * -SearchBase $SwarmUnit.DistinguishedName
-    
-                    Write-Verbose "Getting the first user from $OU"
-                    $LuckyUser = $GetNewOUUser[0]
-    
-                    Write-Verbose "Getting the groups $LuckyUser is a member of"
-                    $UserGroups = Get-ADUser $LuckyUser -Properties MemberOf
-    
-                    Write-Verbose "Assigning all groups to Groups variable"
-                    $Groups = $UserGroups.MemberOf
-    
-                    
-                }
+                $SCharacters += $string
     
             }
-    
-            Write-Verbose "End of BEGIN block"
     
         }
     
-        PROCESS {
+        if($Specials) {
     
-            $SwarmUserName = $SwarmUser.toString()
-            $SwarmUnitName = $SwarmUnit.toString()
+             DO {
     
-            Write-Verbose "Start of PROCESS block"
+                    $Count = 0
     
-            Write-Verbose "Getting all users who have not logged in, in over 90 days"
-            $DisableUsers = Get-ADUser -Filter * | Where-Object {$_.LastLogonDate -gt (Get-Date).AddDays(-90)}
+                    $SCharacters = ""
     
-            foreach ($DisableUser in $DisableUsers) {
-                
-                Write-Verbose "Disabling $DisableUser account"
-                if ($PSCmdlet.ShouldProcess($DisableUser,"$DisableUser account will be disabled")) {
+                    while ($Count -ne $Number) {
     
-                    Try {
+                        foreach($l in $Number) {
     
-                        Disable-ADAccount $DisableUser -ErrorAction Stop
+                            $Count += 1
     
-                    } Catch {
+                            $Characters = 33..126
+                            $Random = Get-Random $Characters
+                            $string = [char]$Random
     
-                        Write-Warning "Unable to disable users $DisableUser"
+                            $SCharacters += $string
     
-                    }
-    
-                    Write-Verbose "Moving $DisableUser to holding OU"
-    
-                    Try {
-    
-                        $DisabledGroup = Get-ADOrganizationalUnit -Filter * | Where-Object {$_.Name -eq "SWARMDISABLED"}
-                        $DisableUser | Move-ADObject -TargetPath $DisabledGroup  -ErrorAction Stop
-    
-                    } Catch {
-                        
-                        Write-Warning "Unable to move $DisableUser to $DisabledGroup"
+                        }
     
                     }
     
-                }
+                    $arrays = $SCharacters.ToCharArray()
     
-            }
+                    $normal = ''
+                    $special = ''
     
-            Write-Verbose "Getting all groups $SwarmUser is a member of"
-            $SwarmUserGroups = (Get-ADUser $SwarmUser -Properties MemberOf).MemberOf
-            
-            foreach ($SwarmUserGroup in $SwarmUserGroups) {
-                
-                Write-Verbose "Removing $SwarmUser from $ $SwarmUserGroup"
+                    foreach ($array in $arrays) {
     
-                if ($PSCmdlet.ShouldProcess($SwarmUserGroup,"$SwarmUser will be removed as a member of")) {
+                        if ($array -match '[^a-zA-Z0-9]') {
     
-                    Try {
+                            $special += $array
     
-                        Remove-ADGroupMember -Identity $SwarmUserGroup -Members $SwarmUser -Confirm:$false -ErrorAction Stop
+                        } else {
     
-                    } Catch {
+                            $normal += $array
     
-                        Write-Warning "Unable to remove $SwarmUser from $SwarmUserGroups"
+                        }
     
                     }
     
-                }
+                } Until ($special.Length -ge $Specials)
+    
+                $SCharacters
+    
+            } else {
+    
+                $SCharacters
     
             }
     
-            Write-Verbose "Adding groups to $SwarmUser"
-            foreach ($Group in $Groups) {
-    
-                Write-Verbose "Adding $SwarmUser to $Group"
-    
-                if ($PSCmdlet.ShouldProcess($Group,"$SwarmUser will be added to")) {
-    
-                    Try {
-    
-                        Add-ADGroupMember -Identity $Group -Members $SwarmUser -ErrorAction Stop
-    
-                    } Catch {
-    
-                        Write-Warning "Unable to add $SwarmUser to $Group"
-    
-                    }
-    
-                }
-    
-            }
-            
-            Write-Verbose "Moving $SwarmUser to $OU"
-    
-            if ($PSCmdlet.ShouldProcess($_,"$SwarmUser will be moved to")) {
-    
-                Try {
-    
-                    Move-ADObject -Identity $SwarmUserName -TargetPath $SwarmUnitName
-    
-                } Catch {
-    
-                    Write-Warning "Unable to move $SwarmUserName to $SwarmUnitName"
-    
-                }
-    
-            }
-    
-            Write-Verbose "End of PROCESS block"
-    
-        }
-    
-        END {
-    
-        }
-    
-    }
+    } 
