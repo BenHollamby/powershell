@@ -33,3 +33,50 @@ You don’t have to necessarily create the virtual machine entirely from scratch
 
 Good Automating!
 #>
+
+function New-SwarmHVVM {
+
+    [cmdletbinding()]
+
+    param (
+
+        [Parameter(Mandatory,
+                   ValueFromPipeline 
+                   )]
+        [string]$VMName,
+
+        [int64]$Memory = 4294967296, #could make this smarter...
+
+        [int]$Processors = 4
+
+    )
+
+    BEGIN {
+
+        New-VM -Name $VMName -MemoryStartupBytes $Memory -Generation 2 | Out-Null
+        
+        $Path = "C:\Users\Public\Documents\Hyper-V\Virtual hard disks\$VMNAME.vhdx"
+        New-VHD -Path $Path -SizeBytes 40GB -Dynamic | Out-Null
+        Add-VMHardDiskDrive -VMName $VMName -Path $Path
+        
+        Add-VMDvdDrive -VMName $VMName -Path H:\Server2022.iso
+        
+        Set-VM -Name $VMName -ProcessorCount $Processors -AutomaticCheckpointsEnabled $false
+        
+        Set-VMMemory -VMName $VMName -DynamicMemoryEnabled $false
+        
+        Connect-VMNetworkAdapter -VMName $VMName -SwitchName "Default Switch"
+        
+    }
+
+    PROCESS {
+
+        Start-VM -Name $VMName
+
+    }
+
+    END {
+
+    }
+    
+}
