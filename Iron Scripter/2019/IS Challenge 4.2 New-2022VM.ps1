@@ -1,5 +1,33 @@
 function Clone-HVVM {
 
+    <#
+    .SYNOPSIS
+    Clone-HVVM will create a new Hyper-V virtual machine from a template
+    .DESCRIPTION
+    This creates a brand new virtual machine cloned from a template. 
+    Currently only have a Server 2022 template, but all set up configuration
+    is complete via an unattend file set up in the template
+    .PARAMETER Name
+    Mandatory
+    Names the VM
+    .PARAMETER Template
+    Mandatory
+    Tab complete for template
+    Only have Server 2022 as a template at this stage
+    .PARAMETER Path
+    Mandatory
+    Tab complete for drive. If the drive is anything other than C:\ (or F:\ cause space)
+    Sets the variable to the VMs folder location
+    .PARAMETER Processors
+    Optional
+    Tab complete going 1 through 8. Default set to 4.
+    .PARAMETER Memory
+    Optional
+    Tab complete going 1 through 8. Default set to 4.
+    .EXAMPLE
+    Clone-HVVM -Name Test88 -Template Server2022 -Path H:\
+    #>
+
     [cmdletbinding()]
 
     param (
@@ -66,7 +94,6 @@ function Clone-HVVM {
 
             $Continue = $false
             Write-Warning "Failed to create New-VM"
-            $Error[0]
 
         }
 
@@ -114,7 +141,6 @@ function Clone-HVVM {
 
                 $Continue = $false
                 Write-Warning "Unable to create VM directory"
-                $Error[0]
 
             }
 
@@ -192,9 +218,9 @@ function Clone-HVVM {
 
         Write-Verbose "Starting END block"
 
-        Write-Verbose "Starting VM"
         Try {
 
+            Write-Verbose "Starting VM"
             Start-VM $name -ErrorAction Stop
 
         } Catch {
