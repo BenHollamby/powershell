@@ -37,10 +37,14 @@ function Complete-VMBuild {
         Write-Verbose "creating folders in C:\Data"
         $monthnames = (New-Object System.Globalization.DateTimeFormatInfo).MonthNames
 
-        foreach ($month in $monthnames) {
+        $months = $monthnames | Select-Object -SkipLast 1
 
-            New-Item -Name $month -Path C:\Data
+        foreach ($month in $months) {
 
+            $smonth = $month.Substring(0,3)
+
+            New-Item -Name $smonth -Path C:\Data | Out-Null
+    
         }
 
         Try {
@@ -98,7 +102,7 @@ function Complete-VMBuild {
         Try {
 
             Write-Verbose "Installing Enhanced Storage"
-            Install-WindowsFeature -Name EnhancedStorage -IncludeAllSubFeature -IncludeManagementTools -ErrorAction Stop
+            Install-WindowsFeature -Name EnhancedStorage -IncludeAllSubFeature -IncludeManagementTools | Out-Null -ErrorAction Stop
 
         } Catch {
 
