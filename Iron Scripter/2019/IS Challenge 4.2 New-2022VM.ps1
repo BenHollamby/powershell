@@ -1,0 +1,208 @@
+function Clone-HVVM {
+
+    [cmdletbinding()]
+
+    param (
+
+        [Parameter(Mandatory,
+                   ValueFromPipeline
+                   )]
+        [string]$Name,
+
+        [Parameter(Mandatory)]
+        [ArgumentCompleter({"Server2022", "Server2019"})]
+        [string]$Template,
+
+        [Parameter(Mandatory)]
+        [ArgumentCompleter({Get-PSDrive | Where-Object {$_.Provider -like "*FileSystem*" -and $_.Name -ne "F"} | Select-Object -ExpandProperty Root})]
+        [string]$Path,
+
+        [ArgumentCompleter({1..8})]
+        [int]$Processors = 4,
+
+        [ArgumentCompleter({1..8})]
+        [int]$Memory = 4
+
+    )
+
+    BEGIN {
+
+        Write-Verbose "Starting BEGIN block"
+
+        Write-Verbose "Setting Path variable"
+        if ($Path -eq "C:\") {
+
+            $Path = "C:\Users\Public\Documents\Hyper-V\VMs"
+
+        } else {
+
+            $Path = "$path\VMs"
+
+        }
+
+        Write-Verbose "Converting Memory variable from GB to Bytes"
+        $MemoryBytes = $Memory * ([math]::Pow(1024,3))
+
+        Write-Verbose "Setting VHDX path for Template variable"
+        if ($Template -eq "Server2022") {
+
+            $VHDX = 'H:\Server Templates\Server2022Template\Virtual Hard Disks\Server2022Template.vhdx'
+
+        }
+
+    }
+
+    PROCESS {
+
+        Write-Verbose "Starting Process Block"
+
+        Try {
+
+            $Continue = $true
+            Write-Verbose "Creating Gen 2 VM named $Name with $Memory GB of Memory"
+            New-VM -Name $Name -MemoryStartupBytes $MemoryBytes -Generation 2 | Out-Null -ErrorAction Stop
+        
+        } Catch {
+
+            $Continue = $false
+            Write-Warning "Failed to create New-VM"
+            $Error[0]
+
+        }
+
+        if ($Continue){
+
+            Try {
+
+                Write-Verbose "Setting $Processors vCPUs on $Name and disabling automatic checkpoints"
+                Set-VM -Name $Name -ProcessorCount $Processors -AutomaticCheckpointsEnabled $false -ErrorAction Stop
+
+            } Catch {
+                
+                Write-Warning "Unable to set VM processor count or disable automatic checkpoints"
+
+            }
+
+            Try {
+
+                Write-Verbose "Disabling dynamic memory"
+                Set-VMMemory -VMName $Name -DynamicMemoryEnabled $false
+
+            } Catch {
+
+                Write-Warning "Unable to disable dynamic memory"
+
+            }
+            
+            Try {
+
+                Write-Verbose "Connecting Network Adapter to VM $Name"
+                Connect-VMNetworkAdapter -VMName $Name -SwitchName "Default Switch"
+
+            } Catch {
+
+                Write-Warning "Unable to connect Default Switch network adapter to $VMName"
+
+            }
+
+            Try {
+
+                Write-Verbose "Creating VM location"
+                $vmpath = New-Item -Name $Name -ItemType Directory -Path $Path -ErrorAction Stop
+
+            } Catch {
+
+                $Continue = $false
+                Write-Warning "Unable to create VM directory"
+                $Error[0]
+
+            }
+
+            if ($Continue) {
+
+                Try {
+
+                    Write-Verbose "Creating vm disk directory"
+                    $vmdiskpath = New-Item -Name "Virtual Hard Disks" -ItemType Directory -Path $vmpath -ErrorAction Stop
+
+                } Catch {
+                    $Continue = $false
+                    Write-Warning "Unable to create disk directory"
+
+                }
+
+                if ($Continue) {
+
+                    Try {
+
+                        Write-Verbose "Copying Server Template"
+                        Copy-Item -Path $VHDX -Destination $vmdiskpath -ErrorAction Stop
+
+                    } Catch {
+
+                        $Continue = $false
+                        Write-Warning "Unable to copy server template"
+
+                    }
+
+                    if ($Continue) {
+
+                        Try {
+
+                            Write-Verbose "Attaching disk to VM"
+                            Add-VMHardDiskDrive -VMName $Name -Path "$vmdiskpath\Server2022Template.vhdx" -ErrorAction Stop
+
+                        } Catch {
+
+                            $Continue = $false
+                            Write-Warning "Unable to attach disk"
+
+                        }
+
+                        if ($Continue) {
+
+                            Write-Verbose "Setting Boot Order"
+                            $BootOrder = (Get-VMFirmware $Name).BootOrder
+                            $PXE = $BootOrder[0]
+                            $HDD = $BootOrder[1]
+                            
+                            Try {
+
+                                Set-VMFirmware -VMName $Name -BootOrder $HDD,$PXE -ErrorAction Stop
+
+                            } Catch {
+
+                                Write-Warning "Unable to set bootorder"
+
+                            }
+
+                        }
+
+                    }
+
+                } 
+
+            }
+
+        } 
+
+    }
+
+    END {
+
+        Write-Verbose "Starting END block"
+
+        Write-Verbose "Starting VM"
+        Try {
+
+            Start-VM $name -ErrorAction Stop
+
+        } Catch {
+
+            Write-Warning "Unable to start VM"
+
+        } 
+
+    }
+
+}
