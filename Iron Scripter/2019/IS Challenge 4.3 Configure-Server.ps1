@@ -28,8 +28,8 @@ function Complete-VMBuild {
 
         Write-Verbose "creating directories"
 
-        New-Item -Name Temp -Path C:\ -ItemType Directory
-        New-Item -Name Data -Path C:\ -ItemType Directory
+        New-Item -Name Temp -Path C:\ -ItemType Directory | Out-Null
+        New-Item -Name Data -Path C:\ -ItemType Directory | Out-Null
 
         Write-Verbose "Setting PS policy to remote siged"
         Set-ExecutionPolicy remotesigned
