@@ -131,18 +131,88 @@ function Invoke-Menu {
 
     BEGIN {
 
-        Do {
+        
+        $Name = Read-Host "What is the full name of the new staff member?"
 
-            $Name = Read-Host "What is the full name of the new staff member?"
+        if ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
 
-        } Until ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName))
+            Write-Warning "This user already exists"
 
-        $Position = Read-Host "What is their position?"
-        $Branch = Read-Host "What is the full name of the new staff member?"
-        $Address = Read-Host "What is the full name of the new staff member?"
-        $Mobile = Read-Host "What is the full name of the new staff member?"
-        $Manager = Read-Host "Who is their manager?"
-        $Password = Read-Host "Please enter an initial password"
+            Do {
+        
+                Write-Host "================== Options ===================="
+                Write-Host "1: Press '1' to confirm this is a new user with the same name as an existing employee."
+                Write-Host "2: Press '2' to try again."
+                Write-Host "q: Press 'q' to quit."
+                Write-Host "==============================================="
+
+                $UserNameSelection = Read-Host "Please make a selection"
+
+                if ($UserNameSelection -eq 1) {
+
+                    $Name = Read-Host "Please enter the full name again with their middle name"
+
+                    if ($Name -eq '') {
+
+                        Do {
+
+                            $Name = Read-Host "Please enter the full name again with their middle name"
+
+                        } Until ($Name -ne '')
+
+                    }
+
+                }
+
+                elseif ($UserNameSelection -eq 2) {
+
+                    $Name = Read-Host "What is the full name of the new staff member?"
+
+                    if ($Name -eq '') {
+
+                        Do {
+
+                            $Name = Read-Host "Nothing entered, please enter a first name and a last name"
+
+                        } Until ($Name -ne '')
+
+                    }
+
+                    elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
+
+                        Write-Warning "This user already exists"
+
+                    }
+
+                }
+
+                elseif ($UserNameSelection -eq 'q') {
+
+                    $Continue = $False
+                    break
+
+                }
+
+                else {
+
+                    Write-Warning "Not a valid choice, please read the prompt and try again."
+
+                }
+
+            } until (-not($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)))
+
+        }
+
+        if ($Continue) {
+
+            $Position = Read-Host "What is their position?"
+            $Branch = Read-Host "What is the full name of the new staff member?"
+            $Address = Read-Host "What is the full name of the new staff member?"
+            $Mobile = Read-Host "What is the full name of the new staff member?"
+            $Manager = Read-Host "Who is their manager?"
+            $Password = Read-Host "Please enter an initial password"
+
+        }
 
     }
 
