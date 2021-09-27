@@ -130,26 +130,73 @@ function Invoke-Menu {
     )
 
     BEGIN {
+        
+        Write-Verbose "Starting BEGIN BLOCK"
 
+        $Continue = $true
+
+        Write-Verbose "Getting new staff member name"
         
         $Name = Read-Host "What is the full name of the new staff member?"
 
+        if ($Name -eq '') {
+
+        Write-Verbose "Name is empty, warning prompt"
+        Write-Warning "Name is empty, do you want to continue?"
+
+        Write-Host "================== Options ===================="
+        Write-Host "1: Press '1' to continue"
+        Write-Host "2: Press '2' to quit."
+        Write-Host "==============================================="
+
+        $NameSelection = Read-Host "Please confirm a selection"
+
+        if ($NameSelection -eq 1) {
+
+            Write-Verbose "User selected $NameSelection"
+            $Title = Read-Host "What is their full name?"
+
+            if ($Name -eq '') {
+
+                Do {
+
+                    $Name = Read-Host "What is their full name?"
+
+                } Until ($Name -ne '')
+
+            }
+
+        }
+
+        elseif ($NameSelection -eq 2) {
+
+            Write-Verbose "User selected $NameSelection to quit"
+            break
+
+        }
+
+
+    }
+
+        Write-Verbose "Checking against existing users"
         if ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
 
+            Write-Verbose "User already exists"
             Write-Warning "This user already exists"
 
             Do {
         
                 Write-Host "================== Options ===================="
-                Write-Host "1: Press '1' to confirm this is a new user with the same name as an existing employee."
-                Write-Host "2: Press '2' to try again."
-                Write-Host "q: Press 'q' to quit."
+                Write-Host " Press '1' to confirm this is a new user with the same name as an existing employee."
+                Write-Host " Press '2' to try again."
+                Write-Host " Press 'q' to quit."
                 Write-Host "==============================================="
 
                 $UserNameSelection = Read-Host "Please make a selection"
 
                 if ($UserNameSelection -eq 1) {
 
+                    Write-Verbose "User selected $UserNameSelection"
                     $Name = Read-Host "Please enter the full name again with their middle name"
 
                     if ($Name -eq '') {
@@ -162,10 +209,19 @@ function Invoke-Menu {
 
                     }
 
+
+                    elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
+
+                        Write-Warning "As stated, this user already exists"
+
+                    }
+
+
                 }
 
                 elseif ($UserNameSelection -eq 2) {
 
+                    Write-Verbose "User selected $UserNameSelection"
                     $Name = Read-Host "What is the full name of the new staff member?"
 
                     if ($Name -eq '') {
@@ -187,8 +243,9 @@ function Invoke-Menu {
                 }
 
                 elseif ($UserNameSelection -eq 'q') {
-
-                    $Continue = $False
+                    
+                    Write-Verbose "User selected $UserNameSelection to quit"
+                    #$Continue = $False
                     break
 
                 }
@@ -203,12 +260,61 @@ function Invoke-Menu {
 
         }
 
-        if ($Continue) {
+        if ($Continue) {        
 
-            $Position = Read-Host "What is their position?"
-            $Branch = Read-Host "What is the full name of the new staff member?"
-            $Address = Read-Host "What is the full name of the new staff member?"
-            $Mobile = Read-Host "What is the full name of the new staff member?"
+            Write-Verbose "Prompting for Job Title"
+            $Title = Read-Host "What is their job title?"
+
+            if ($Title -eq '') {
+
+                Write-Verbose "Title is empty, warning prompt"
+                Write-Warning "Job Title is empty, do you want to continue?"
+
+                Write-Host "================== Options ===================="
+                Write-Host " Press '1' to enter a title"
+                Write-Host " Press '2' to skip."
+                Write-Host " Press 'q' to abort."
+                Write-Host "==============================================="
+
+                $TitleSelection = Read-Host "Please confirm a selection"
+
+                if ($TitleSelection -eq 1) {
+
+                    Write-Verbose "User selected $TitleSelection"
+                    $Title = Read-Host "What is their job title?"
+
+                    if ($Title -eq '') {
+
+                        Do {
+
+                            $Title = Read-Host "What is their job title?"
+
+                        } Until ($Title -ne '')
+
+                    }
+
+                }
+
+                elseif ($TitleSelection -eq 2) {
+
+                    Write-Verbose "User selected $TitleSelection to skip"
+                    $Title = $null
+
+                }
+
+                elseif ($TitleSelection -eq 'q') {
+
+                    Write-Verbose "User selected $TitleSelection to quit"
+                    #$Continue = $false
+                    Break
+
+                }
+
+            }
+
+            $Branch = Read-Host "What is the bRANCH?"
+            $Address = Read-Host "What is the ADDRESS?"
+            $Mobile = Read-Host "What is the MOBILE?"
             $Manager = Read-Host "Who is their manager?"
             $Password = Read-Host "Please enter an initial password"
 
@@ -226,3 +332,104 @@ function Invoke-Menu {
 
 }
 
+<#
+OFFICE PROPERTIES
+Get-ADUser -Filter * -Properties Office | Where-Object {$_.Office -ne "Test Account"} | Sort-Object Office | Select-Object -ExpandProperty Office | Get-Unique
+Central Branch
+Central Office
+Chartwell Branch
+Chartwell Office
+City Office
+Dinsdale
+Dinsdale Branch
+Glenview Branch
+Head Office
+Hillcrest
+Hillcrest Branch
+Rototuna Branch
+
+Title | Should also be their description
+Get-ADUser -Filter * -Properties "Title" | Sort-Object Title | Select-Object -ExpandProperty Title | Get-Unique 
+Branch Manager
+Chartwell Branch Manager
+Office Administrator
+
+Manager
+Get-ADUser -Filter * -Properties "Manager" | Sort-Object Manager | Select-Object -ExpandProperty Manager | Get-Unique
+CN=Allan Archer,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
+CN=Angus Mills,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
+CN=Brian King,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
+CN=Daryll Roberts,OU=Disabled Accounts,OU=Monarch,DC=monarch,DC=local
+CN=David Forster,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
+CN=Davinder Singh,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
+CN=Heidi Puriri,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
+CN=Paul McNeil,OU=Disabled Accounts,OU=Monarch,DC=monarch,DC=local
+CN=Trent Finlay,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
+
+Description
+get-aduser -Filter * -Properties description | Sort-Object description | Select-Object -ExpandProperty description | get-unique
+A user account managed by the system.
+Account to login into Boardroom
+Account used for connection to Azure AD
+Account used for Fortinet Single-Sign On
+Account used for LDAP lookups - SSLVPN
+Account used for running the ASP.NET worker process (aspnet_wp.exe)
+Admin account - added as per Allan's request 3/5/2016
+Branch Manager
+Branch Manager - Rototuna
+Branch Manager (Glenview)
+Branch Manager(Rototuna)
+Built-in account for administering the computer/domain
+Built-in account for anonymous access to Internet Information Services
+Built-in account for guest access to the computer/domain
+Built-in account for Internet Information Services to start out of process applications
+Chartwell Administrator
+Chartwell Agent
+City Administrator
+City Administrator No. 1
+City Agent 1
+Commercial Agent
+Datacom Contractor
+Dedicated User to run VMware Converter Standalone server jobs.
+Dinsdale Administrator
+Dinsdale Agent
+Director
+Executive Assistant
+Exists purely to forward misdirected email.
+Glenview Administrator
+Glenview Agent
+Gold Account
+Gold support remote access
+Hamilton Agent
+Head Office Accountant
+Head Office Administrator No. 1
+Head Office Administrator No. 2
+Head Office Administrator No. 4
+Head Office Administrator No. 5
+Head Office Administrator No. 6
+Head Office Administrator No. 7
+Hillcrest Administrator
+Hillcrest Agent
+Hillcrest Agent 1
+Key Distribution Center Service Account
+Management Accountant
+MoneyWorks NAI Commercial Ledger
+Murray Friend
+Office Administrator
+Office Administrator Hamilton
+Office Administrator Hamilton Downstairs
+Office Administrator(Disabled on instructions from Heidi)
+Photographer
+Rototuna Administrator
+Rototuna Agent
+Service account for Automate monitoring agent
+System Administrator A/C
+Temp OA account - enabled as needed
+This is a vendor's account for the Help and Support Service
+Veeam backup service account
+
+
+Mobile
+Should really be in 3 - 3 - 4 format
+
+#>
