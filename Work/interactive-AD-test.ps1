@@ -313,6 +313,57 @@ function Invoke-Menu {
             }
 
             $Branch = Read-Host "What is the bRANCH?"
+            $Branch = Read-Host "Which branch will $Name be located at?"
+
+        if ($Branch = '') {
+
+            Write-Verbose "Branch is empty"
+            Write-Warning "Branch is empty, is this intentional?"
+
+                Write-Host "================== Options ===================="
+                Write-Host " Press '1' to enter a branch"
+                Write-Host " Press '2' to leave blank."
+                Write-Host " Press 'q' to abort."
+                Write-Host "==============================================="
+
+                $BranchSelection = Read-Host "Please confirm a selection"
+
+                if ($BranchSelection -eq 1) {
+
+                    Write-Verbose "User selected $BranchSelection"
+                    $Branch = Read-Host "Which branch will $Name be located at?"
+
+                    if ($Branch -eq '') {
+
+                        Do {
+
+                            $Branch = Read-Host "Which branch will $Name be located at?"
+
+                        } Until ($Branch -ne '')
+
+                    }
+
+                }
+
+                elseif ($BranchSelection -eq 2) {
+
+                    Write-Verbose "User selected $BranchSelection to skip"
+                    $Title = $null
+
+                }
+
+                elseif ($BranchSelection -eq 'q') {
+
+                    Write-Verbose "User selected $BranchSelection to quit"
+                    Break
+
+                }
+
+        } elseif ($Branch -in (Get-ADUser -Filter * -Properties Office | Sort-Object Office | Select-Object -ExpandProperty Office | Get-Unique)) {
+
+           Write-Host "This is in!"
+
+        }
             $Address = Read-Host "What is the ADDRESS?"
             $Mobile = Read-Host "What is the MOBILE?"
             $Manager = Read-Host "Who is their manager?"
