@@ -140,10 +140,12 @@ function Invoke-Menu {
 #### Start of getting the name selection
 
         $Name = Read-Host "What is the full name of the new staff member?"
+        write-host ''
 
         if ($Name -eq '') {
 
         Write-Verbose "Name is empty, warning prompt"
+        write-host ''
         Write-Warning "Name is empty, do you want to continue?"
 
         Write-Host "================== Options ===================="
@@ -152,6 +154,7 @@ function Invoke-Menu {
         Write-Host "==============================================="
 
         $NameSelection = Read-Host "Please confirm a selection"
+        write-host ''
 
         if ($NameSelection -eq 1) {
 
@@ -188,13 +191,16 @@ function Invoke-Menu {
 
                 Do {
             
+                    Write-Host ''
                     Write-Host "================== Options ===================="
-                    Write-Host " Press '1' to confirm this is a new user with the same name as an existing employee."
-                    Write-Host " Press '2' to try again."
-                    Write-Host " Press 'q' to quit."
+                    Write-Host -ForegroundColor Yellow " Press '1' to confirm this is a new user with the same name as an existing employee."
+                    Write-Host -ForegroundColor Yellow " Press '2' to try again."
+                    Write-Host -ForegroundColor Yellow " Press 'q' to quit."
                     Write-Host "==============================================="
+                    Write-Host ''
 
                     $UserNameSelection = Read-Host "Please make a selection"
+                    Write-Host ''
 
                     if ($UserNameSelection -eq 1) {
 
@@ -214,7 +220,9 @@ function Invoke-Menu {
 
                         elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
 
+                            Write-Host ''
                             Write-Warning "As stated, this user already exists"
+                            Write-Host ''
 
                         }
 
@@ -275,13 +283,16 @@ function Invoke-Menu {
                 if ($Title -eq '') {
 
                     Write-Verbose "Title is empty, warning prompt"
+                    write-host ''
                     Write-Warning "Job Title is empty, do you want to continue?"
 
+                    Write-Host ''
                     Write-Host "================== Options ===================="
                     Write-Host -ForegroundColor Yellow " Press '1' to enter a title"
                     Write-Host -ForegroundColor Yellow " Press '2' to skip."
                     Write-Host -ForegroundColor Yellow " Press 'q' to abort."
                     Write-Host "==============================================="
+                    Write-Host ''
 
                     $TitleSelection = Read-Host "Please confirm a selection"
 
@@ -326,6 +337,7 @@ function Invoke-Menu {
                 
                 Write-Host "Please select which branch the user is based at"
 
+                Write-Host ''
                 Write-Host "================== Options ======================================================="
                 Write-Host -ForegroundColor Green " Press '1' to select Central Branch"
                 Write-Host -ForegroundColor Green " Press '2' to select Chartwell Branch"
@@ -338,6 +350,7 @@ function Invoke-Menu {
                 Write-Host -ForegroundColor Green " Press '9' to enter a branch that doesn't exist here yet"
                 Write-Host -ForegroundColor Green " Press 'Enter' to skip"
                 Write-Host "=================================================================================="
+                Write-Host ''
 
                 $Branch = Read-Host "Please select which branch the user is based at"
 
@@ -411,7 +424,9 @@ function Invoke-Menu {
 
                     Do {
 
+                        Write-Host ''
                         Write-Warning "You've failed to select a valid choice, please read and try again"
+                        write-host ''
                         Write-Host "================== Options ======================================================="
                         Write-Host -ForegroundColor Yellow " Press '1' to select Central Branch"
                         Write-Host -ForegroundColor Yellow " Press '2' to select Chartwell Branch"
@@ -424,6 +439,7 @@ function Invoke-Menu {
                         Write-Host -ForegroundColor Yellow " Press '9' to enter a branch that doesn't exist here yet"
                         Write-Host -ForegroundColor Yellow " Press 'Enter' to skip"
                         Write-Host "=================================================================================="
+                        Write-Host ''
 
                         $Branch = Read-Host "Please select which branch the user is based at"
 
@@ -499,14 +515,52 @@ function Invoke-Menu {
 
         Write-Host ''
 
-        $Address = Read-Host "What is the ADDRESS?"
-        $Mobile = Read-Host "What is the MOBILE?"
+#### End of branch section
+#### Start of Address section
+        write-host ''
+        $Address = Read-Host "Enter Address, or press enter to skip"
+        write-host ''
+
+#### End of address section
+#### Start of Mobile number section
+
+        write-host ''
+        $Mobile = Read-Host "What is the MOBILE?" #Need to check for INT, Need to check for second space?
+        write-host ''
+
+        if ($Mobile[3] -ne ' ') {
+
+            $First3 = $Mobile.Substring(0,3)
+            $Second3 = $Mobile.Substring(3,3)
+            $LastDigits = $Mobile.Substring(6)
+
+            $Mobile = "$First3 $Second3 $LastDigits"
+
+        } 
+
+#### End of Mobile section
+#### Start of Manager section
+
         $Manager = Read-Host "Who is their manager?"
+        Get-ADUser -Filter * -Properties Manager | Sort-Object Manager | Select-Object -ExpandProperty Manager | Get-Unique
+        $Managers = 'CN=drone 14,OU=OUZEROTWO,DC=swarm,DC=com', 'CN=drone one,CN=Users,DC=swarm,DC=com', 'CN=drone seven,OU=OUZEROTWO,DC=swarm,DC=com', 'CN=drone six,OU=OUZEROONE,DC=swarm,DC=com'
+
+        foreach ($Manager in $Managers) {
+
+            $r = $Manager.Split('=')[1]
+            $e = $r.Split(',')[0]
+            $e
+        }
         $Password = Read-Host "Please enter an initial password"
 
     }
 
     PROCESS {
+
+        $Name
+        $Title
+        $Branch
+        $Mobile
 
     }
 
