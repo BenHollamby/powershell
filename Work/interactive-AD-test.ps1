@@ -136,7 +136,9 @@ function Invoke-Menu {
         $Continue = $true
 
         Write-Verbose "Getting new staff member name"
-        
+
+#### Start of getting the name selection
+
         $Name = Read-Host "What is the full name of the new staff member?"
 
         if ($Name -eq '') {
@@ -176,200 +178,331 @@ function Invoke-Menu {
         }
 
 
-    }
-
-        Write-Verbose "Checking against existing users"
-        if ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
-
-            Write-Verbose "User already exists"
-            Write-Warning "This user already exists"
-
-            Do {
-        
-                Write-Host "================== Options ===================="
-                Write-Host " Press '1' to confirm this is a new user with the same name as an existing employee."
-                Write-Host " Press '2' to try again."
-                Write-Host " Press 'q' to quit."
-                Write-Host "==============================================="
-
-                $UserNameSelection = Read-Host "Please make a selection"
-
-                if ($UserNameSelection -eq 1) {
-
-                    Write-Verbose "User selected $UserNameSelection"
-                    $Name = Read-Host "Please enter the full name again with their middle name"
-
-                    if ($Name -eq '') {
-
-                        Do {
-
-                            $Name = Read-Host "Please enter the full name again with their middle name"
-
-                        } Until ($Name -ne '')
-
-                    }
-
-
-                    elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
-
-                        Write-Warning "As stated, this user already exists"
-
-                    }
-
-
-                }
-
-                elseif ($UserNameSelection -eq 2) {
-
-                    Write-Verbose "User selected $UserNameSelection"
-                    $Name = Read-Host "What is the full name of the new staff member?"
-
-                    if ($Name -eq '') {
-
-                        Do {
-
-                            $Name = Read-Host "Nothing entered, please enter a first name and a last name"
-
-                        } Until ($Name -ne '')
-
-                    }
-
-                    elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
-
-                        Write-Warning "This user already exists"
-
-                    }
-
-                }
-
-                elseif ($UserNameSelection -eq 'q') {
-                    
-                    Write-Verbose "User selected $UserNameSelection to quit"
-                    #$Continue = $False
-                    break
-
-                }
-
-                else {
-
-                    Write-Warning "Not a valid choice, please read the prompt and try again."
-
-                }
-
-            } until (-not($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)))
-
         }
 
-        if ($Continue) {        
+            Write-Verbose "Checking against existing users"
+            if ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
 
-            Write-Verbose "Prompting for Job Title"
-            $Title = Read-Host "What is their job title?"
+                Write-Verbose "User already exists"
+                Write-Warning "This user already exists"
 
-            if ($Title -eq '') {
+                Do {
+            
+                    Write-Host "================== Options ===================="
+                    Write-Host " Press '1' to confirm this is a new user with the same name as an existing employee."
+                    Write-Host " Press '2' to try again."
+                    Write-Host " Press 'q' to quit."
+                    Write-Host "==============================================="
 
-                Write-Verbose "Title is empty, warning prompt"
-                Write-Warning "Job Title is empty, do you want to continue?"
+                    $UserNameSelection = Read-Host "Please make a selection"
 
-                Write-Host "================== Options ===================="
-                Write-Host " Press '1' to enter a title"
-                Write-Host " Press '2' to skip."
-                Write-Host " Press 'q' to abort."
-                Write-Host "==============================================="
+                    if ($UserNameSelection -eq 1) {
 
-                $TitleSelection = Read-Host "Please confirm a selection"
+                        Write-Verbose "User selected $UserNameSelection"
+                        $Name = Read-Host "Please enter the full name again with their middle name"
 
-                if ($TitleSelection -eq 1) {
+                        if ($Name -eq '') {
 
-                    Write-Verbose "User selected $TitleSelection"
-                    $Title = Read-Host "What is their job title?"
+                            Do {
 
-                    if ($Title -eq '') {
+                                $Name = Read-Host "Please enter the full name again with their middle name"
 
-                        Do {
+                            } Until ($Name -ne '')
 
-                            $Title = Read-Host "What is their job title?"
+                        }
 
-                        } Until ($Title -ne '')
+
+                        elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
+
+                            Write-Warning "As stated, this user already exists"
+
+                        }
+
 
                     }
 
-                }
+                    elseif ($UserNameSelection -eq 2) {
 
-                elseif ($TitleSelection -eq 2) {
+                        Write-Verbose "User selected $UserNameSelection"
+                        $Name = Read-Host "What is the full name of the new staff member?"
 
-                    Write-Verbose "User selected $TitleSelection to skip"
-                    $Title = $null
+                        if ($Name -eq '') {
 
-                }
+                            Do {
 
-                elseif ($TitleSelection -eq 'q') {
+                                $Name = Read-Host "Nothing entered, please enter a first name and a last name"
 
-                    Write-Verbose "User selected $TitleSelection to quit"
-                    #$Continue = $false
-                    Break
+                            } Until ($Name -ne '')
 
-                }
+                        }
+
+                        elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
+
+                            Write-Warning "This user already exists"
+
+                        }
+
+                    }
+
+                    elseif ($UserNameSelection -eq 'q') {
+                        
+                        Write-Verbose "User selected $UserNameSelection to quit"
+                        #$Continue = $False
+                        break
+
+                    }
+
+                    else {
+
+                        Write-Warning "Not a valid choice, please read the prompt and try again."
+
+                    }
+
+                } until (-not($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)))
 
             }
 
-            $Branch = Read-Host "What is the bRANCH?"
-            $Branch = Read-Host "Which branch will $Name be located at?"
+    #### End of Name section        
+    #### Start of Title selection
 
-        if ($Branch = '') {
+            Write-Host ''
 
-            Write-Verbose "Branch is empty"
-            Write-Warning "Branch is empty, is this intentional?"
+            if ($Continue) {        
 
-                Write-Host "================== Options ===================="
-                Write-Host " Press '1' to enter a branch"
-                Write-Host " Press '2' to leave blank."
-                Write-Host " Press 'q' to abort."
-                Write-Host "==============================================="
+                Write-Verbose "Prompting for Job Title"
+                $Title = Read-Host "What is their job title?"
 
-                $BranchSelection = Read-Host "Please confirm a selection"
+                if ($Title -eq '') {
 
-                if ($BranchSelection -eq 1) {
+                    Write-Verbose "Title is empty, warning prompt"
+                    Write-Warning "Job Title is empty, do you want to continue?"
 
-                    Write-Verbose "User selected $BranchSelection"
-                    $Branch = Read-Host "Which branch will $Name be located at?"
+                    Write-Host "================== Options ===================="
+                    Write-Host -ForegroundColor Yellow " Press '1' to enter a title"
+                    Write-Host -ForegroundColor Yellow " Press '2' to skip."
+                    Write-Host -ForegroundColor Yellow " Press 'q' to abort."
+                    Write-Host "==============================================="
 
-                    if ($Branch -eq '') {
+                    $TitleSelection = Read-Host "Please confirm a selection"
 
-                        Do {
+                    if ($TitleSelection -eq 1) {
 
-                            $Branch = Read-Host "Which branch will $Name be located at?"
+                        Write-Verbose "User selected $TitleSelection"
+                        $Title = Read-Host "What is their job title?"
 
-                        } Until ($Branch -ne '')
+                        if ($Title -eq '') {
+
+                            Do {
+
+                                $Title = Read-Host "What is their job title?"
+
+                            } Until ($Title -ne '')
+
+                        }
+
+                    }
+
+                    elseif ($TitleSelection -eq 2) {
+
+                        Write-Verbose "User selected $TitleSelection to skip"
+                        $Title = $null
+
+                    }
+
+                    elseif ($TitleSelection -eq 'q') {
+
+                        Write-Verbose "User selected $TitleSelection to quit"
+                        #$Continue = $false
+                        Break
 
                     }
 
                 }
 
-                elseif ($BranchSelection -eq 2) {
+                write-host ''
 
-                    Write-Verbose "User selected $BranchSelection to skip"
-                    $Title = $null
+    ##### End of Title selection
+    ##### Start of branch selection         
+                
+                Write-Host "Please select which branch the user is based at"
+
+                Write-Host "================== Options ======================================================="
+                Write-Host -ForegroundColor Green " Press '1' to select Central Branch"
+                Write-Host -ForegroundColor Green " Press '2' to select Chartwell Branch"
+                Write-Host -ForegroundColor Green " Press '3' to select City Branch"
+                Write-Host -ForegroundColor Green " Press '4' to select Dinsdale Branch"
+                Write-Host -ForegroundColor Green " Press '5' to select Glenview Branch"
+                Write-Host -ForegroundColor Green " Press '6' to select Head Office"
+                Write-Host -ForegroundColor Green " Press '7' to select Hillcrest Branch"
+                Write-Host -ForegroundColor Green " Press '8' to select Rototuna Branch"
+                Write-Host -ForegroundColor Green " Press '9' to enter a branch that doesn't exist here yet"
+                Write-Host -ForegroundColor Green " Press 'Enter' to skip"
+                Write-Host "=================================================================================="
+
+                $Branch = Read-Host "Please select which branch the user is based at"
+
+                if ($Branch -eq '' -or $Branch -in 1..9) {
+
+                    if ($Branch -eq 1) {
+
+                    $Branch = "Central Branch"
+
+                    }
+
+                    elseif ($Branch -eq 2) {
+
+                    $Branch = "Chartwell Branch"
+
+                    }
+
+                    elseif ($Branch -eq 3) {
+
+                    $Branch = "City Branch"
+
+                    }
+
+                    elseif ($Branch -eq 4) {
+
+                    $Branch = "Dinsdale Branch"
+
+                    }
+
+                    elseif ($Branch -eq 5) {
+
+                    $Branch = "Glenview Branch"
+
+                    }
+
+                elseif ($Branch -eq 6) {
+
+                $Branch = "Head Office"
 
                 }
 
-                elseif ($BranchSelection -eq 'q') {
+                elseif ($Branch -eq 7) {
 
-                    Write-Verbose "User selected $BranchSelection to quit"
-                    Break
+                $Branch = "Hillcrest Branch"
 
                 }
 
-        } elseif ($Branch -in (Get-ADUser -Filter * -Properties Office | Sort-Object Office | Select-Object -ExpandProperty Office | Get-Unique)) {
+                elseif ($Branch -eq 8) {
 
-           Write-Host "This is in!"
+                $Branch = "Rototuna Branch"
 
+                }
+
+                elseif ($Branch -eq 9) {
+
+                    Do {
+
+                        $Branch = Read-Host "Please enter the branch name you would like to use"
+
+                    } until ($Branch -ne '')
+
+                }
+
+                    elseif ($Branch -eq '') {
+
+                        $Branch = $null
+
+                    }
+
+                } else {
+
+                    Do {
+
+                        Write-Warning "You've failed to select a valid choice, please read and try again"
+                        Write-Host "================== Options ======================================================="
+                        Write-Host -ForegroundColor Yellow " Press '1' to select Central Branch"
+                        Write-Host -ForegroundColor Yellow " Press '2' to select Chartwell Branch"
+                        Write-Host -ForegroundColor Yellow " Press '3' to select City Branch"
+                        Write-Host -ForegroundColor Yellow " Press '4' to select Dinsdale Branch"
+                        Write-Host -ForegroundColor Yellow " Press '5' to select Glenview Branch"
+                        Write-Host -ForegroundColor Yellow " Press '6' to select Head Office"
+                        Write-Host -ForegroundColor Yellow " Press '7' to select Hillcrest Branch"
+                        Write-Host -ForegroundColor Yellow " Press '8' to select Rototuna Branch"
+                        Write-Host -ForegroundColor Yellow " Press '9' to enter a branch that doesn't exist here yet"
+                        Write-Host -ForegroundColor Yellow " Press 'Enter' to skip"
+                        Write-Host "=================================================================================="
+
+                        $Branch = Read-Host "Please select which branch the user is based at"
+
+                    } until ($Branch -eq '' -or $Branch -in 1..9)
+
+                    if ($Branch -eq 1) {
+
+                    $Branch = "Central Branch"
+
+                    }
+
+                    elseif ($Branch -eq 2) {
+
+                    $Branch = "Chartwell Branch"
+
+                    }
+
+                    elseif ($Branch -eq 3) {
+
+                    $Branch = "City Branch"
+
+                    }
+
+                    elseif ($Branch -eq 4) {
+
+                    $Branch = "Dinsdale Branch"
+
+                    }
+
+                    elseif ($Branch -eq 5) {
+
+                    $Branch = "Glenview Branch"
+
+                    }
+
+                elseif ($Branch -eq 6) {
+
+                $Branch = "Head Office"
+
+                }
+
+                elseif ($Branch -eq 7) {
+
+                $Branch = "Hillcrest Branch"
+
+                }
+
+                elseif ($Branch -eq 8) {
+
+                $Branch = "Rototuna Branch"
+
+                }
+
+                elseif ($Branch -eq 9) {
+
+                    Do {
+
+                        $Branch = Read-Host "Please enter the branch name you would like to use"
+
+                    } until ($Branch -ne '')
+
+                }
+
+                    elseif ($Branch -eq '') {
+
+                        $Branch = $null
+
+                    }
+
+                }
+                
         }
-            $Address = Read-Host "What is the ADDRESS?"
-            $Mobile = Read-Host "What is the MOBILE?"
-            $Manager = Read-Host "Who is their manager?"
-            $Password = Read-Host "Please enter an initial password"
 
-        }
+        Write-Host ''
+
+        $Address = Read-Host "What is the ADDRESS?"
+        $Mobile = Read-Host "What is the MOBILE?"
+        $Manager = Read-Host "Who is their manager?"
+        $Password = Read-Host "Please enter an initial password"
 
     }
 

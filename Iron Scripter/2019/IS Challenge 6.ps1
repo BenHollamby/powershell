@@ -1,18 +1,27 @@
 <#
-The Chairman is back with another challenge, this one probably more on the harder end. Although once you get your head around how to solve it, you’ll probably find it pretty easy. Your challenge is to solve a cryptogram like this, presumably using PowerShell.
+The Chairman is back with another challenge, this one probably more on the harder end. 
+Although once you get your head around how to solve it, you’ll probably find it pretty easy.
+ Your challenge is to solve a cryptogram like this, presumably using PowerShell.
 
 $crypto = @"
 g - 2 5 R e t o p c 7 -
 h v 1 Q n e l b e d E p
 "@
-Inside this string block is a hidden message. To solve or decrypt, you need a pair of numbers, X and Y. Starting in the upper left you would start counting X number of characters, starting at 1. Once you have the first letter then count Y number of characters for the 2nd letter. Then X number of characters for the 3rd letter and so on. The end result will be a word or phrase with no spaces. But it should be recognizable to you
+Inside this string block is a hidden message. To solve or decrypt, you need a pair of numbers, 
+X and Y. Starting in the upper left you would start counting X number of characters, starting at 1. 
+Once you have the first letter then count Y number of characters for the 2nd letter. 
+Then X number of characters for the 3rd letter and so on. 
+The end result will be a word or phrase with no spaces. But it should be recognizable to you
 
-In this sample, the solution is 1,5. You would start counting at 1 for the first letter. Then count 5 for the next, 1 for the next and so on.
+In this sample, the solution is 1,5. You would start counting at 1 for the first letter.
+Then count 5 for the next, 1 for the next and so on.
 
 
 Do you see the hidden message?
 
-Ready for a challenge? Find the hidden message in this cryptogram. You’ll have to discover the key intervals. It could be 2,6 or 3,8 or 6,2. To make it easier, the cryptogram is written so that you do not have to loop around.
+Ready for a challenge? Find the hidden message in this cryptogram. 
+You’ll have to discover the key intervals. It could be 2,6 or 3,8 or 6,2. 
+To make it easier, the cryptogram is written so that you do not have to loop around.
 
 $crypto = @"
 P k T r 2 s z 2 * c F -
@@ -30,5 +39,6 @@ q = F & w B 6 c % H l y
 "@
 Once you discover the correct intervals, the message should be self-evident.
 
-In order to give everyone a chance to solve this, please don’t submit any answers as comments. They won’t be published. But you are welcome to submit links to your work and solution.
+In order to give everyone a chance to solve this, please don’t submit any answers as comments.
+ They won’t be published. But you are welcome to submit links to your work and solution.
 #>
