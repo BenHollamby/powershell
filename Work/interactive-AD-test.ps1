@@ -148,10 +148,10 @@ function Invoke-Menu {
         write-host ''
         Write-Warning "Name is empty, do you want to continue?"
 
-        Write-Host "================== Options ===================="
-        Write-Host "1: Press '1' to continue"
-        Write-Host "2: Press '2' to quit."
-        Write-Host "==============================================="
+        Write-Host -ForegroundColor Yellow "================== Options ===================="
+        Write-Host -ForegroundColor Yellow "1: Press '1' to try again"
+        Write-Host -ForegroundColor Yellow "2: Press '2' to quit."
+        Write-Host -ForegroundColor Yellow "==============================================="
 
         $NameSelection = Read-Host "Please confirm a selection"
         write-host ''
@@ -159,7 +159,7 @@ function Invoke-Menu {
         if ($NameSelection -eq 1) {
 
             Write-Verbose "User selected $NameSelection"
-            $Title = Read-Host "What is their full name?"
+            $Name = Read-Host "What is their full name?"
 
             if ($Name -eq '') {
 
@@ -168,6 +168,23 @@ function Invoke-Menu {
                     $Name = Read-Host "What is their full name?"
 
                 } Until ($Name -ne '')
+
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq $Name}) {
+
+                    Do {
+
+                        Write-Warning "Sorry User exists, please try again"
+                        $Name = Read-Host "What is their full name?"
+
+                    } until (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq $Name}))
+
+                }
+
+            }
+
+            else {
+
+                Continue
 
             }
 
@@ -238,14 +255,25 @@ function Invoke-Menu {
 
                             Do {
 
-                                $Name = Read-Host "Nothing entered, please enter a first name and a last name"
+                                write-host ''
+                                Write-Warning "Nothing entered"
+                                write-host ''
+                                $Name = Read-Host "Please enter a first name and a last name"
 
                             } Until ($Name -ne '')
+
+                            if ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
+
+                                write-host ''
+                                write-warning "Sorry user already exists here"
+
+                            }
 
                         }
 
                         elseif ($Name -in (Get-ADUser -Filter * -Properties DisplayName | Select-Object -ExpandProperty DisplayName)) {
 
+                            write-host ''
                             Write-Warning "This user already exists"
 
                         }
@@ -270,6 +298,8 @@ function Invoke-Menu {
 
             }
 
+            Clear-Host
+
     #### End of Name section        
     #### Start of Title selection
 
@@ -278,7 +308,7 @@ function Invoke-Menu {
             if ($Continue) {        
 
                 Write-Verbose "Prompting for Job Title"
-                $Title = Read-Host "What is their job title?"
+                $Title = Read-Host "What is $Name's job title?"
 
                 if ($Title -eq '') {
 
@@ -287,11 +317,11 @@ function Invoke-Menu {
                     Write-Warning "Job Title is empty, do you want to continue?"
 
                     Write-Host ''
-                    Write-Host "================== Options ===================="
+                    Write-Host -ForegroundColor Yellow "================== Options ===================="
                     Write-Host -ForegroundColor Yellow " Press '1' to enter a title"
                     Write-Host -ForegroundColor Yellow " Press '2' to skip."
                     Write-Host -ForegroundColor Yellow " Press 'q' to abort."
-                    Write-Host "==============================================="
+                    Write-Host -ForegroundColor Yellow "==============================================="
                     Write-Host ''
 
                     $TitleSelection = Read-Host "Please confirm a selection"
@@ -323,7 +353,6 @@ function Invoke-Menu {
                     elseif ($TitleSelection -eq 'q') {
 
                         Write-Verbose "User selected $TitleSelection to quit"
-                        #$Continue = $false
                         Break
 
                     }
@@ -332,10 +361,12 @@ function Invoke-Menu {
 
                 write-host ''
 
+                Clear-Host
+
     ##### End of Title selection
     ##### Start of branch selection         
                 
-                Write-Host "Please select which branch the user is based at"
+                Write-Host "Which Branch will $Name be located at?"
 
                 Write-Host ''
                 Write-Host "================== Options ======================================================="
@@ -352,7 +383,7 @@ function Invoke-Menu {
                 Write-Host "=================================================================================="
                 Write-Host ''
 
-                $Branch = Read-Host "Please select which branch the user is based at"
+                $Branch = Read-Host "Which Branch will $Name be located at?"
 
                 if ($Branch -eq '' -or $Branch -in 1..9) {
 
@@ -408,7 +439,7 @@ function Invoke-Menu {
 
                     Do {
 
-                        $Branch = Read-Host "Please enter the branch name you would like to use"
+                        $Branch = Read-Host "Which Branch will $Name be located at?"
 
                     } until ($Branch -ne '')
 
@@ -441,7 +472,7 @@ function Invoke-Menu {
                         Write-Host "=================================================================================="
                         Write-Host ''
 
-                        $Branch = Read-Host "Please select which branch the user is based at"
+                        $Branch = Read-Host "Which Branch will $Name be located at?"
 
                     } until ($Branch -eq '' -or $Branch -in 1..9)
 
@@ -513,19 +544,19 @@ function Invoke-Menu {
                 
         }
 
-        Write-Host ''
+        Clear-Host
 
 #### End of branch section
 #### Start of Address section
         write-host ''
-        $Address = Read-Host "Enter Address, or press enter to skip"
+        $Address = Read-Host "Enter address, or press enter to skip"
         write-host ''
-
+        Clear-Host
 #### End of address section
 #### Start of Mobile number section
 
         write-host ''
-        $Mobile = Read-Host "What is the MOBILE?" #Need to check for INT, Need to check for second space?
+        $Mobile = Read-Host "What is $Name's mobile number?" #Need to check for INT, Need to check for second space?
         write-host ''
 
         if ($Mobile[3] -ne ' ') {
@@ -537,30 +568,180 @@ function Invoke-Menu {
             $Mobile = "$First3 $Second3 $LastDigits"
 
         } 
-
+        Clear-Host
 #### End of Mobile section
 #### Start of Manager section
 
         $Manager = Read-Host "Who is their manager?"
-        Get-ADUser -Filter * -Properties Manager | Sort-Object Manager | Select-Object -ExpandProperty Manager | Get-Unique
-        $Managers = 'CN=drone 14,OU=OUZEROTWO,DC=swarm,DC=com', 'CN=drone one,CN=Users,DC=swarm,DC=com', 'CN=drone seven,OU=OUZEROTWO,DC=swarm,DC=com', 'CN=drone six,OU=OUZEROONE,DC=swarm,DC=com'
 
-        foreach ($Manager in $Managers) {
+        $managers = Get-ADUser -Filter * -Properties Manager | Sort-Object Manager | Select-Object -ExpandProperty Manager | Get-Unique
 
-            $r = $Manager.Split('=')[1]
-            $e = $r.Split(',')[0]
-            $e
+        $managerlist = @()
+
+        foreach ($item in $managers) {
+
+        $SplitLeft = $item.Split('=')[1]
+        $ManagerString = $SplitLeft.Split(',')[0]
+        $managerlist += ,$ManagerString
         }
-        $Password = Read-Host "Please enter an initial password"
 
-    }
+        if ($Manager -notin $managerlist) {
+
+            write-host ''
+            Write-Warning "This is not an existing manager. Do you wish to continue?"
+            write-host ''
+            Write-Host "================== Options ======================================================="
+            Write-Host -ForegroundColor Yellow " Press '1' to continue"
+            Write-Host -ForegroundColor Yellow " Press '2' to leave blank"
+            Write-Host -ForegroundColor Yellow " Press '3' to try again"
+            Write-Host "=================================================================================="
+            Write-Host ''
+
+            $ManagerSelection = Read-Host "Please select an option"
+
+            if ($ManagerSelection -eq 1) {
+
+                if (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"})) {
+
+                    Write-Warning "Manager does not exist in AD, leaving blank"
+
+                }
+
+            } elseif ($ManagerSelection -eq 2) {
+
+                $Continue
+
+            } elseif ($ManagerSelection -eq 3) {
+
+                Do {
+
+                    $Manager = Read-Host "Who is their manager, please enter the first and last name of an AD user?"
+
+                } Until (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"})
+
+            }
+
+        }  
+        Clear-Host
+#### End of Manager Section
+#### Start of permissions section
+
+        $CopyUser = Read-Host "Please enter the name of the user to base permissions on"
+
+        if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"}) {
+
+            $UserGroups = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"}
+            $Groups = (Get-ADUser $UserGroups -Properties MemberOf).MemberOf
+
+        } else {
+
+            Write-Warning "User does not exist in Tenancy"
+            write-host ''
+            Write-Host "================== Options ======================================================="
+            Write-Host -ForegroundColor Yellow " Press '1' to try again"
+            Write-Host -ForegroundColor Yellow " Press '2' to forgo group memberships at this time"
+            Write-Host "=================================================================================="
+            Write-Host ''
+
+            $CopyUserSelection = Read-Host "Please enter a choice"
+
+            if ($CopyUserSelection -eq 1) {
+
+                $CopyUser = Read-Host "Please enter the name of the user to base permissions on"
+
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"}) {
+
+                    $UserGroups = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"}
+                    $Groups = (Get-ADUser $UserGroups -Properties MemberOf).MemberOf
+
+                } else {
+
+                    Do {
+
+                        $CopyUser = Read-Host "Please enter the name of the user to base permissions on"
+
+                    } Until (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"})
+
+                    $UserGroups = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"}
+                    $Groups = (Get-ADUser $UserGroups -Properties MemberOf).MemberOf
+
+                }
+
+            } elseif ($CopyUserSelection -eq 2) {
+
+                Continue
+
+            }
+
+        }
+        Clear-Host
+#### End of permissions section
+#### Start of Password Section
+
+        $Password = Read-Host "Please enter an initial password" -AsSecureString
+
+        if ((-not($Password.Length -ge 8))) {
+
+            Do {
+
+                Write-Warning "Password does not meet the length of 8+ characters"
+                $Password = Read-Host "Please enter an initial password" -AsSecureString
+
+            } until ($Password.Length -ge 8)
+
+        } 
+        Clear-Host
+
+#### End of Password section
+#### Final chance to abort section
+
+        $object = [PSCustomObject]@{
+
+            Name     = $Name
+            Title    = $Title
+            Branch   = $Branch
+            Mobile   = $Mobile
+            Manager  = $Manager
+            Address  = $Address
+
+        }
+
+        Write-Host -ForegroundColor Yellow "A NEW USER IS ABOUT TO BE CREATED WITH THE FOLLOWING INFORMATION"
+
+        $object | Format-Table
+
+        Write-Host -ForegroundColor Yellow "================== Options ======================================="
+        Write-Host -ForegroundColor Yellow " Press '1' to create new user"
+        Write-Host -ForegroundColor Yellow " Press '2' to abort"
+        Write-Host -ForegroundColor Yellow "=================================================================="
+
+        $Selection = Read-Host "Do you wish to continue?"
+
+        if ($Selection -eq 1) {
+
+            $Continue -eq $true
+
+        } else {
+
+            $Continue -eq $false
+
+        }
+
+#### End of final chance section
+
+    } #end of begin block
 
     PROCESS {
 
+        <#
         $Name
         $Title
         $Branch
         $Mobile
+        $Manager
+        $Groups
+        $Password
+        #>
 
     }
 
@@ -569,105 +750,3 @@ function Invoke-Menu {
     }
 
 }
-
-<#
-OFFICE PROPERTIES
-Get-ADUser -Filter * -Properties Office | Where-Object {$_.Office -ne "Test Account"} | Sort-Object Office | Select-Object -ExpandProperty Office | Get-Unique
-Central Branch
-Central Office
-Chartwell Branch
-Chartwell Office
-City Office
-Dinsdale
-Dinsdale Branch
-Glenview Branch
-Head Office
-Hillcrest
-Hillcrest Branch
-Rototuna Branch
-
-Title | Should also be their description
-Get-ADUser -Filter * -Properties "Title" | Sort-Object Title | Select-Object -ExpandProperty Title | Get-Unique 
-Branch Manager
-Chartwell Branch Manager
-Office Administrator
-
-Manager
-Get-ADUser -Filter * -Properties "Manager" | Sort-Object Manager | Select-Object -ExpandProperty Manager | Get-Unique
-CN=Allan Archer,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
-CN=Angus Mills,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
-CN=Brian King,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
-CN=Daryll Roberts,OU=Disabled Accounts,OU=Monarch,DC=monarch,DC=local
-CN=David Forster,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
-CN=Davinder Singh,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
-CN=Heidi Puriri,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
-CN=Paul McNeil,OU=Disabled Accounts,OU=Monarch,DC=monarch,DC=local
-CN=Trent Finlay,OU=O365 Users,OU=Monarch_Users,OU=Monarch,DC=monarch,DC=local
-
-Description
-get-aduser -Filter * -Properties description | Sort-Object description | Select-Object -ExpandProperty description | get-unique
-A user account managed by the system.
-Account to login into Boardroom
-Account used for connection to Azure AD
-Account used for Fortinet Single-Sign On
-Account used for LDAP lookups - SSLVPN
-Account used for running the ASP.NET worker process (aspnet_wp.exe)
-Admin account - added as per Allan's request 3/5/2016
-Branch Manager
-Branch Manager - Rototuna
-Branch Manager (Glenview)
-Branch Manager(Rototuna)
-Built-in account for administering the computer/domain
-Built-in account for anonymous access to Internet Information Services
-Built-in account for guest access to the computer/domain
-Built-in account for Internet Information Services to start out of process applications
-Chartwell Administrator
-Chartwell Agent
-City Administrator
-City Administrator No. 1
-City Agent 1
-Commercial Agent
-Datacom Contractor
-Dedicated User to run VMware Converter Standalone server jobs.
-Dinsdale Administrator
-Dinsdale Agent
-Director
-Executive Assistant
-Exists purely to forward misdirected email.
-Glenview Administrator
-Glenview Agent
-Gold Account
-Gold support remote access
-Hamilton Agent
-Head Office Accountant
-Head Office Administrator No. 1
-Head Office Administrator No. 2
-Head Office Administrator No. 4
-Head Office Administrator No. 5
-Head Office Administrator No. 6
-Head Office Administrator No. 7
-Hillcrest Administrator
-Hillcrest Agent
-Hillcrest Agent 1
-Key Distribution Center Service Account
-Management Accountant
-MoneyWorks NAI Commercial Ledger
-Murray Friend
-Office Administrator
-Office Administrator Hamilton
-Office Administrator Hamilton Downstairs
-Office Administrator(Disabled on instructions from Heidi)
-Photographer
-Rototuna Administrator
-Rototuna Agent
-Service account for Automate monitoring agent
-System Administrator A/C
-Temp OA account - enabled as needed
-This is a vendor's account for the Help and Support Service
-Veeam backup service account
-
-
-Mobile
-Should really be in 3 - 3 - 4 format
-
-#>
