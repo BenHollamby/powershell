@@ -137,6 +137,8 @@ function Invoke-Menu {
 
         Write-Verbose "Getting new staff member name"
 
+        Clear-Host
+
 #### Start of getting the name selection
 
         $Name = Read-Host "What is the full name of the new staff member?"
@@ -312,50 +314,61 @@ function Invoke-Menu {
 
                 if ($Title -eq '') {
 
-                    Write-Verbose "Title is empty, warning prompt"
-                    write-host ''
-                    Write-Warning "Job Title is empty, do you want to continue?"
+                    Do {
 
-                    Write-Host ''
-                    Write-Host -ForegroundColor Yellow "================== Options ===================="
-                    Write-Host -ForegroundColor Yellow " Press '1' to enter a title"
-                    Write-Host -ForegroundColor Yellow " Press '2' to skip."
-                    Write-Host -ForegroundColor Yellow " Press 'q' to abort."
-                    Write-Host -ForegroundColor Yellow "==============================================="
-                    Write-Host ''
+                        Write-Verbose "Title is empty, warning prompt"
 
-                    $TitleSelection = Read-Host "Please confirm a selection"
+                        Write-Host ''
+                        Write-Host -ForegroundColor Yellow "================== Options ===================="
+                        Write-Host -ForegroundColor Yellow " Press '1' to enter a title"
+                        Write-Host -ForegroundColor Yellow " Press '2' to skip."
+                        Write-Host -ForegroundColor Yellow " Press 'q' to abort."
+                        Write-Host -ForegroundColor Yellow "==============================================="
+                        Write-Host ''
 
-                    if ($TitleSelection -eq 1) {
+                        $TitleSelection = Read-Host "Please confirm a selection"
 
-                        Write-Verbose "User selected $TitleSelection"
-                        $Title = Read-Host "What is their job title?"
+                        if ($TitleSelection -eq 1) {
 
-                        if ($Title -eq '') {
+                            Write-Verbose "User selected $TitleSelection"
+                            $Title = Read-Host "What is their job title?"
 
-                            Do {
+                            if ($Title -eq '') {
 
-                                $Title = Read-Host "What is their job title?"
+                                Do {
+                                    
+                                    Write-Warning "Job Title is empty, please try again."
+                                    $Title = Read-Host "What is their job title?"
 
-                            } Until ($Title -ne '')
+                                } Until ($Title -ne '')
+
+                            }
 
                         }
 
-                    }
+                        elseif ($TitleSelection -eq 2) {
 
-                    elseif ($TitleSelection -eq 2) {
+                            Write-Verbose "User selected $TitleSelection to skip"
+                            $Title = $null
 
-                        Write-Verbose "User selected $TitleSelection to skip"
-                        $Title = $null
+                        }
 
-                    }
+                        elseif ($TitleSelection -eq 'q') {
 
-                    elseif ($TitleSelection -eq 'q') {
+                            Write-Verbose "User selected $TitleSelection to quit"
+                            Break
 
-                        Write-Verbose "User selected $TitleSelection to quit"
-                        Break
+                        }
 
-                    }
+                        else {
+                        
+                            write-host ''
+                            Write-Warning "Not a valid choice, please read the above and try again"
+
+                        }
+
+                    } until ($Title -ne '')
+
 
                 }
 
@@ -669,7 +682,7 @@ function Invoke-Menu {
 
             } elseif ($CopyUserSelection -eq 2) {
 
-                Continue
+                $Groups = $null
 
             }
 
