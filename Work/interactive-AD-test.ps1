@@ -121,6 +121,129 @@ function Invoke-Menu {
 
  }
     
+ function Write-Menu {
+
+    Write-Host "================== Monarch's Menu ===================="
+
+    Write-Host "1: Press '1' to create a new user."
+    Write-Host "2: Press '2' to create a new contact."
+    Write-Host "3: Press '3' to edit an existing user."
+    Write-Host "4: Press '4' to get details of an existing user."
+    Write-Host "5: Press '5' to disable a user."
+    Write-Host "5: Press '6' to delete a user."
+    Write-Host "q: Press 'q' to quit."
+    Write-Host "================== End of Menu ======================="
+}
+
+function Invoke-Menu {
+
+
+    BEGIN {
+
+        Write-Menu
+
+        do {
+
+            $selection = Read-Host "Please make a selection"
+
+            if ($selection -eq "1") {
+
+                Write-Output "You have selected to create a new user."
+
+            }
+
+            elseif ($selection -eq "2") {
+
+                Write-Output "You have selected to create a new contact."
+
+            }
+
+            elseif ($selection -eq "3") {
+
+                Write-Output "You have selected to edit an existing user."
+
+            }
+
+            elseif ($selection -eq "4") {
+
+                Write-Output "You have selected to get details of an existing user."
+
+            }
+
+            elseif ($selection -eq "5") {
+
+                Write-Output "You have selected to disable a user."
+
+            }
+
+            elseif ($selection -eq "6") {
+
+                Write-Output "You have selected to delete a user."
+
+            }
+
+            elseif ($selection -eq "q") {
+
+                Write-Output "You have selected to quit, exiting menu."
+
+            }
+        
+            else {
+
+                Write-Host "Your selection is invalid. Please try and read the prompt, then try again."
+
+            }
+
+        }  until ($selection -gt 0 -and $selection -le 6 -or $selection -eq 'q')
+
+    }
+
+    PROCESS {
+
+        if ($selection -eq 1) {
+
+            Write-Output "This is selection one"
+
+        }
+        
+        if ($selection -eq 2) {
+
+            Write-Output "This is selection two"
+
+        }
+
+        if ($selection -eq 3) {
+
+            Write-Output "This is selection  three"
+
+        }
+
+        if ($selection -eq 4) {
+
+            Write-Output "This is selection four"
+
+        }
+
+        if ($selection -eq 5) {
+
+            Write-Output "This is selection five"
+
+        }
+
+        if ($selection -eq 6) {
+
+            Write-Output "This is selection six"
+
+        }
+
+    }
+
+    END {
+
+    }
+
+ }
+    
  function New-MonarchUser{
 
     [cmdletbinding()]
@@ -327,6 +450,7 @@ function Invoke-Menu {
                         Write-Host ''
 
                         $TitleSelection = Read-Host "Please confirm a selection"
+                        write-host ''
 
                         if ($TitleSelection -eq 1) {
 
@@ -596,9 +720,159 @@ function Invoke-Menu {
         $SplitLeft = $item.Split('=')[1]
         $ManagerString = $SplitLeft.Split(',')[0]
         $managerlist += ,$ManagerString
+
         }
 
-        if ($Manager -notin $managerlist) {
+        if (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {
+
+            write-host ''
+            Write-Warning "User does not exist in Active Directory"
+            write-host ''
+            Write-Host -ForegroundColor Yellow "================== Options =========================="
+            Write-Host -ForegroundColor Yellow " Press '1' to try again"
+            Write-Host -ForegroundColor Yellow " Press '2' to leave blank"
+            Write-Host -ForegroundColor Yellow "====================================================="
+            Write-Host ''
+
+            $managerselection = Read-Host "Please make a selection"
+
+            if ($managerselection -eq 1) {
+
+                $Manager = Read-Host "Who is their manager?"
+
+                if (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})){
+
+                    Do {
+
+                        write-host ''
+                        Write-Warning "User does not exist, please try again"
+                        $Manager = Read-Host "Who is their manager?"
+
+                    } until (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})
+
+                    if ($Manager -notin $managerlist) {
+
+                        write-host ''
+                        Write-Warning "This is not an existing manager. Do you wish to continue?"
+                        write-host ''
+                        Write-Host "================== Options ======================================================="
+                        Write-Host -ForegroundColor Yellow " Press '1' for continue with $Manager as the manager"
+                        Write-Host -ForegroundColor Yellow " Press '2' to leave blank"
+                        Write-Host "=================================================================================="
+                        Write-Host ''
+
+                        $ManagerSelection = Read-Host "Please select an option"
+
+                        if ($managerselection -eq 1) {
+
+                            Continue
+
+                        } elseif ($managerselection -eq 2) {
+
+                            $Manager = $null
+
+                        } else {
+
+                            Do {
+
+                                write-host ''
+                                Write-Warning "Not a valid option try again"
+                                write-host ''
+                                Write-Host "================== Options ======================================================="
+                                Write-Host -ForegroundColor Yellow " Press '1' for yes"
+                                Write-Host -ForegroundColor Yellow " Press '2' to leave blank"
+                                Write-Host "=================================================================================="
+                                Write-Host ''
+
+                                $ManagerSelection = Read-Host "Please select an option"
+
+                            } until ($managerselection -eq 1 -or $managerselection -eq 2)
+
+                        }
+
+                    } #
+
+                } Elseif ($Manager -notin $managerlist) {
+
+                    write-host ''
+                    Write-Warning "This is not an existing manager. Do you wish to continue?"
+                    write-host ''
+                    Write-Host "================== Options ======================================================="
+                    Write-Host -ForegroundColor Yellow " Press '1' to continue"
+                    Write-Host -ForegroundColor Yellow " Press '2' to leave blank"
+                    Write-Host -ForegroundColor Yellow " Press '3' to try again"
+                    Write-Host "=================================================================================="
+                    Write-Host ''
+
+                    $ManagerSelection = Read-Host "Please select an option"
+
+                    if ($ManagerSelection -eq 1) {
+
+                        if (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"})) {
+
+                            Write-Warning "Manager does not exist in AD, leaving blank"
+
+                        }
+
+                    } elseif ($ManagerSelection -eq 2) {
+
+                        $Manager = $null
+
+                    } elseif ($ManagerSelection -eq 3) {
+
+                        Do {
+
+                            $Manager = Read-Host "Who is their manager, please enter the first and last name of an AD user?"
+
+                        } Until (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"})
+
+                        if ($Manager -notin $managerlist) {
+
+                            write-host ''
+                            Write-Warning "This is not an existing manager. Do you wish to continue?"
+                            write-host ''
+                            Write-Host "================== Options ======================================================="
+                            Write-Host -ForegroundColor Yellow " Press '1' to continue"
+                            Write-Host -ForegroundColor Yellow " Press '2' to leave blank"
+                            Write-Host -ForegroundColor Yellow " Press '3' to try again"
+                            Write-Host "=================================================================================="
+                            Write-Host ''
+
+                            $ManagerSelection = Read-Host "Please select an option"
+
+                            if ($ManagerSelection -eq 1) {
+
+                                if (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"})) {
+
+                                    Write-Warning "Manager does not exist in AD, leaving blank"
+
+                                }
+
+                            } elseif ($ManagerSelection -eq 2) {
+
+                                $Manager = $null
+
+                            } elseif ($ManagerSelection -eq 3) {
+
+                                Do {
+
+                                    write-host ''
+                                    $Manager = Read-Host "Who is their manager?"
+
+                                } Until (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"})
+
+                            }
+
+                        }
+
+                    }
+  
+
+                } #
+
+            }
+
+        } Elseif ($Manager -notin $managerlist) {
 
             write-host ''
             Write-Warning "This is not an existing manager. Do you wish to continue?"
@@ -622,19 +896,24 @@ function Invoke-Menu {
 
             } elseif ($ManagerSelection -eq 2) {
 
-                $Continue
+                $Manager = $null
 
             } elseif ($ManagerSelection -eq 3) {
 
                 Do {
 
-                    $Manager = Read-Host "Who is their manager, please enter the first and last name of an AD user?"
+                    write-host ''
+                    $Manager = Read-Host "Who is their manager?"
 
                 } Until (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"})
 
             }
 
-        }  
+        } elseif ($Manager -eq '') {
+
+            Continue
+
+        }
         Clear-Host
 #### End of Manager Section
 #### Start of permissions section
@@ -687,7 +966,9 @@ function Invoke-Menu {
             }
 
         }
+
         Clear-Host
+
 #### End of permissions section
 #### Start of Password Section
 
@@ -702,7 +983,8 @@ function Invoke-Menu {
 
             } until ($Password.Length -ge 8)
 
-        } 
+        }
+         
         Clear-Host
 
 #### End of Password section
@@ -710,12 +992,12 @@ function Invoke-Menu {
 
         $object = [PSCustomObject]@{
 
-            Name     = $Name
-            Title    = $Title
-            Branch   = $Branch
-            Mobile   = $Mobile
-            Manager  = $Manager
-            Address  = $Address
+            Name     = (Get-Culture).TextInfo.ToTitleCase($Name)
+            Title    = (Get-Culture).TextInfo.ToTitleCase($Title)
+            Branch   = (Get-Culture).TextInfo.ToTitleCase($Branch)
+            Mobile   = (Get-Culture).TextInfo.ToTitleCase($Mobile)
+            Manager  = (Get-Culture).TextInfo.ToTitleCase($Manager)
+            Address  = (Get-Culture).TextInfo.ToTitleCase($Address)
 
         }
 
@@ -763,3 +1045,4 @@ function Invoke-Menu {
     }
 
 }
+ 
