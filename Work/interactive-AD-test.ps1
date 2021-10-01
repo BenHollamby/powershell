@@ -988,7 +988,15 @@ function Invoke-Menu {
         Clear-Host
 
 #### End of Password section
-#### Final chance to abort section
+#### Start of creating email address section
+
+        $emaildomain = "@harcourtshamilton.co.nz"
+        $emailpartone = $Name.Split()[0].tostring()[0]
+        $emailparttwo = $Name.Split()[1]
+        $EmailAddress = "$emailpartone.$emailparttwo$emaildomain"
+
+#### End of creating email address section
+#### Final chance to abort section and list of information gathered
 
         $object = [PSCustomObject]@{
 
@@ -998,6 +1006,7 @@ function Invoke-Menu {
             Mobile   = (Get-Culture).TextInfo.ToTitleCase($Mobile)
             Manager  = (Get-Culture).TextInfo.ToTitleCase($Manager)
             Address  = (Get-Culture).TextInfo.ToTitleCase($Address)
+            Email    = $EmailAddress
 
         }
 
