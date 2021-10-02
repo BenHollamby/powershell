@@ -1,0 +1,7 @@
+Section,Method,Command,Arguments,Name,Description
+Account,powershell_file,C:\Temp\Monarch.ps1,,New User,Create a new user
+Account,powershell_file,,,New Contact,Create a new Contact
+Account,powershell_file,,,Edit User,Edit a user
+Account,powershell_file,,,List User,List user details
+Termination,powershell_file,,,Disable AD Account,Disable a user account
+Termination,powershell_file,,,Delete AD Account,Delete a user account

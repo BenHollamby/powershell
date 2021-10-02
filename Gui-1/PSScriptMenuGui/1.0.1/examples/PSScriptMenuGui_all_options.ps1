@@ -1,4 +1,4 @@
-﻿#region Setup
+#region Setup
 Set-Location $PSScriptRoot
 Remove-Module PSScriptMenuGui -ErrorAction SilentlyContinue
 try {
@@ -12,10 +12,11 @@ catch {
 #endregion
 
 $params = @{
-    csvPath = 'C:\Users\Kallor\devops\powershell\Gui-1\test1.csv'
-    windowTitle = "Chris's bitchin GUI"
+    csvPath = '.\example_data.csv'
+    windowTitle = 'Example with all options'
     buttonForegroundColor = 'Azure'
-    buttonBackgroundColor = '#000000' #eb4034
+    buttonBackgroundColor = '#C00077'
+    iconPath = '.\pwsh7.ico'
     hideConsole = $true
     noExit = $true
     Verbose = $true

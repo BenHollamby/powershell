@@ -1,3 +1,0 @@
-Section,Method,Command,Arguments,Name,Description
-New Hire,powershell_file,,,Open Web Pages,Create a new user
-Termination,powershell_file,,,Disable AD Account,disable a user account
