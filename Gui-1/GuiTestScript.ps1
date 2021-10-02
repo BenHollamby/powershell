@@ -1,0 +1,1 @@
+﻿Show-ScriptMenuGui -csvPath 'C:\Users\Kallor\devops\powershell\Gui-1\test1.csv' -Verbose
