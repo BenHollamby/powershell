@@ -865,19 +865,23 @@ function Invoke-Menu {
         Clear-Host
 
 #### End of Password section
-#### Start of creating email address section
+#### Start of creating email address section and userprincipalname
 
         $emaildomain = "@harcourtshamilton.co.nz"
         $emailpartone = $Name.Split()[0].tostring()[0]
         $emailparttwo = $Name.Split()[1]
         $EmailAddress = "$emailpartone.$emailparttwo$emaildomain"
+        $UserPrincipalName = "$emailpartone.$emailparttwo$emaildomain"
+        $SAMAccountName = "$emailpartone.$emailparttwo"
 
 #### End of creating email address section
 #### Setting Name for AD attributes
-#### end of setting variables for name ad attributes
+#### end of setting variables for name ad attributes, captialise display name and title
 
-        $GivenName = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[0])
-        $Surname   = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[1])
+        $GivenName   = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[0])
+        $Surname     = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[1])
+        $DisplayName = (Get-Culture).TextInfo.ToTitleCase($Name)
+        $Title       = (Get-Culture).TextInfo.ToTitleCase($Title)
 
 #### Final chance to abort section and list of information gathered
 
@@ -930,11 +934,11 @@ function Invoke-Menu {
         $Password
         New-ADUser -Name $Name -Title $Title -Office $Branch -MobilePhone $Mobile -StreetAddress $address -EmailAddress $email -AccountPassword $Password -Enabled $true -DisplayName $Name -GivenName $GivenName -Surname $Surname
         #>
+        New-ADUser -Name $DisplayName -Title $Title -Office $Branch -MobilePhone $Mobile -StreetAddress $address -EmailAddress $EmailAddress -AccountPassword $Password -Enabled $true -DisplayName $DisplayName -GivenName $GivenName -Surname $Surname -UserPrincipalName $UserPrincipalName -SamAccountName $SAMAccountName
+
 
         <#
-        Need First Name
-        Last Name
-       
+               
         Manager 
         SamAccountName?
         $user login name
