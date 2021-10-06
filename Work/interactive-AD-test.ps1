@@ -873,6 +873,12 @@ function Invoke-Menu {
         $EmailAddress = "$emailpartone.$emailparttwo$emaildomain"
 
 #### End of creating email address section
+#### Setting Name for AD attributes
+#### end of setting variables for name ad attributes
+
+        $GivenName = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[0])
+        $Surname   = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[1])
+
 #### Final chance to abort section and list of information gathered
 
         $object = [PSCustomObject]@{
@@ -922,6 +928,17 @@ function Invoke-Menu {
         $Manager
         $Groups
         $Password
+        New-ADUser -Name $Name -Title $Title -Office $Branch -MobilePhone $Mobile -StreetAddress $address -EmailAddress $email -AccountPassword $Password -Enabled $true -DisplayName $Name -GivenName $GivenName -Surname $Surname
+        #>
+
+        <#
+        Need First Name
+        Last Name
+       
+        Manager 
+        SamAccountName?
+        $user login name
+        Groups
         #>
 
     }
