@@ -1,126 +1,3 @@
-function Write-Menu {
-
-    Write-Host "================== Monarch's Menu ===================="
-
-    Write-Host "1: Press '1' to create a new user."
-    Write-Host "2: Press '2' to create a new contact."
-    Write-Host "3: Press '3' to edit an existing user."
-    Write-Host "4: Press '4' to get details of an existing user."
-    Write-Host "5: Press '5' to disable a user."
-    Write-Host "5: Press '6' to delete a user."
-    Write-Host "q: Press 'q' to quit."
-    Write-Host "================== End of Menu ======================="
-}
-
-function Invoke-Menu {
-
-
-    BEGIN {
-
-        Write-Menu
-
-        do {
-
-            $selection = Read-Host "Please make a selection"
-
-            if ($selection -eq "1") {
-
-                Write-Output "You have selected to create a new user."
-
-            }
-
-            elseif ($selection -eq "2") {
-
-                Write-Output "You have selected to create a new contact."
-
-            }
-
-            elseif ($selection -eq "3") {
-
-                Write-Output "You have selected to edit an existing user."
-
-            }
-
-            elseif ($selection -eq "4") {
-
-                Write-Output "You have selected to get details of an existing user."
-
-            }
-
-            elseif ($selection -eq "5") {
-
-                Write-Output "You have selected to disable a user."
-
-            }
-
-            elseif ($selection -eq "6") {
-
-                Write-Output "You have selected to delete a user."
-
-            }
-
-            elseif ($selection -eq "q") {
-
-                Write-Output "You have selected to quit, exiting menu."
-
-            }
-        
-            else {
-
-                Write-Host "Your selection is invalid. Please try and read the prompt, then try again."
-
-            }
-
-        }  until ($selection -gt 0 -and $selection -le 6 -or $selection -eq 'q')
-
-    }
-
-    PROCESS {
-
-        if ($selection -eq 1) {
-
-            Write-Output "This is selection one"
-
-        }
-        
-        if ($selection -eq 2) {
-
-            Write-Output "This is selection two"
-
-        }
-
-        if ($selection -eq 3) {
-
-            Write-Output "This is selection  three"
-
-        }
-
-        if ($selection -eq 4) {
-
-            Write-Output "This is selection four"
-
-        }
-
-        if ($selection -eq 5) {
-
-            Write-Output "This is selection five"
-
-        }
-
-        if ($selection -eq 6) {
-
-            Write-Output "This is selection six"
-
-        }
-
-    }
-
-    END {
-
-    }
-
- }
-
  function New-MonarchUser{
 
     [cmdletbinding()]
@@ -563,7 +440,7 @@ function Invoke-Menu {
 #### End of branch section
 #### Start of Address section
         write-host ''
-        $Address = Read-Host "Enter address, or press enter to skip"
+        $Address = Read-Host "Enter physical address, or press enter to skip"
         write-host ''
         Clear-Host
 #### End of address section
@@ -865,14 +742,16 @@ function Invoke-Menu {
         Clear-Host
 
 #### End of Password section
-#### Start of creating email address section and userprincipalname
+#### Start of creating email address section and userprincipalname, samaccountname. Groups of user and manager objects 
 
-        $emaildomain = "@harcourtshamilton.co.nz"
-        $emailpartone = $Name.Split()[0].tostring()[0]
-        $emailparttwo = $Name.Split()[1]
-        $EmailAddress = "$emailpartone.$emailparttwo$emaildomain"
+        $emaildomain       = "@harcourtshamilton.co.nz"
+        $emailpartone      = $Name.Split()[0].tostring()[0]
+        $emailparttwo      = $Name.Split()[1]
+        $EmailAddress      = "$emailpartone.$emailparttwo$emaildomain"
         $UserPrincipalName = "$emailpartone.$emailparttwo$emaildomain"
-        $SAMAccountName = "$emailpartone.$emailparttwo"
+        $SAMAccountName    = "$emailpartone.$emailparttwo"
+        $MemberShips       = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$CopyUser"}).memberof
+        $ManagerIs           = Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Manager"}
 
 #### End of creating email address section
 #### Setting Name for AD attributes
@@ -910,11 +789,28 @@ function Invoke-Menu {
 
         if ($Selection -eq 1) {
 
-            $Continue -eq $true
+            $Continue -eq $true | Out-Null
 
-        } else {
+        } 
+        
+        elseif ($Selection -eq 2) {
 
-            $Continue -eq $false
+            Break
+
+        }
+
+        else {
+
+            Do {
+                
+                 Write-Warning "Invalid Choice, please read the following and enter an option"
+                 Write-Host -ForegroundColor Yellow "================== Options ======================================="
+                 Write-Host -ForegroundColor Yellow " Press '1' to create new user"
+                 Write-Host -ForegroundColor Yellow " Press '2' to abort"
+                 Write-Host -ForegroundColor Yellow "=================================================================="
+                 $Selection = Read-Host "Do you wish to continue?"
+
+            } until ($Selection -eq 1 -or $Selection -eq 2)
 
         }
 
@@ -924,30 +820,68 @@ function Invoke-Menu {
 
     PROCESS {
 
-        <#
-        $Name
-        $Title
-        $Branch
-        $Mobile
-        $Manager
-        $Groups
-        $Password
-        New-ADUser -Name $Name -Title $Title -Office $Branch -MobilePhone $Mobile -StreetAddress $address -EmailAddress $email -AccountPassword $Password -Enabled $true -DisplayName $Name -GivenName $GivenName -Surname $Surname
-        #>
-        New-ADUser -Name $DisplayName -Title $Title -Office $Branch -MobilePhone $Mobile -StreetAddress $address -EmailAddress $EmailAddress -AccountPassword $Password -Enabled $true -DisplayName $DisplayName -GivenName $GivenName -Surname $Surname -UserPrincipalName $UserPrincipalName -SamAccountName $SAMAccountName
+        if ($Continue) {
 
+            Try {
 
-        <#
-               
-        Manager 
-        SamAccountName?
-        $user login name
-        Groups
-        #>
+                Write-Verbose "Attempting to create $DisplayName"
+                New-ADUser -Path "OU=Swarm Users,OU=Swarm,DC=swarm,DC=com" -Name $DisplayName -Title $Title -Office $Branch -MobilePhone $Mobile -StreetAddress $address -EmailAddress $EmailAddress -AccountPassword $Password -Enabled $true -DisplayName $DisplayName -GivenName $GivenName -Surname $Surname -UserPrincipalName $UserPrincipalName -SamAccountName $SAMAccountName -Manager $ManagerIs -ErrorAction Stop
+
+            } Catch {
+
+                $Continue = $false
+                Write-Warning "Unable to create user $DisplayName"
+                Write-Warning "$Error[0]"
+
+            }
+
+            if ($Continue) {
+
+                $NewUser = Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$DisplayName"}
+
+                foreach ($MemberShip in $MemberShips) {
+                    
+                    Try {
+
+                        Write-Verbose "Assigning $DisplayName to $Membership Group"
+                        Add-ADGroupMember -Identity $MemberShip -Members $NewUser -ErrorAction Stop
+
+                    } Catch {
+
+                        $Continue = $false
+                        Write-Warning "Unable to add $DisplayName to $MemberShip group"
+                        Write-Warning "Error[0]"
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        Clear-Host
 
     }
 
     END {
+
+        $CompletedUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}
+        
+        $object = [PSCustomObject]@{
+
+            Name         = $CompletedUser.Name
+            EmailAddress = $CompletedUser.UserPrincipalName
+            UserName     = $CompletedUser.SamAccountName
+
+        }
+
+        $CompletedName = $CompletedUser.Name
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "$CompletedName's account has been created with the following details:"
+
+        $object | Format-List
 
     }
 
