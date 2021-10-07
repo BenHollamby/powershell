@@ -677,7 +677,7 @@
         if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"}) {
 
             $UserGroups = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$CopyUser"}
-            $Groups = (Get-ADUser $UserGroups -Properties MemberOf).MemberOf
+            #$Groups = (Get-ADUser $UserGroups -Properties MemberOf).MemberOf
 
         } else {
 
