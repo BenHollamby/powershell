@@ -897,7 +897,50 @@
 
         if ($license -eq 1){
 
-            Write-Host "you done chose yes"
+            Write-Verbose "Connecting to 365"
+            
+            Try {
+
+                Connect-MsolService -ErrorAction Stop
+
+            } Catch {
+
+                $Continue = $false
+                Write-Warning "Unable to connect to 365"
+                Write-Warning "$Error[0]"
+                
+            }
+            
+
+            if ($Continue) {
+
+                Write-Verbose "Checking available licenses"
+                $LicenseType = Get-MsolAccountSku | Where-Object {$_.AccountSkuID -eq "reseller-account:O365_BUSINESS_PREMIUM"}
+                $NumberOfLicenses = $LicenseType.ActiveUnits
+                $ConsumedLicenses = $LicenseType.ConsumedUnits
+
+                if (($NumberOfLicenses - $ConsumedLicenses) -ge 1) {
+
+                    Write-Verbose "Licensing User"
+
+                    Try {
+
+                        Set-MsolUserLicense -UserPrincipalName tempben@harcourtshamilton.co.nz -AddLicenses "reseller-account:O365_BUSINESS_PREMIUM"
+
+                    } Catch {
+
+                        Write-Warning "Unable to license user"
+                        Write-Warning "$Error[0]"
+
+                    }
+
+                } else {
+
+                    Write-Warning "No spare licenses, please obtain more"
+
+                }
+
+            }
 
         }
 
@@ -925,11 +968,35 @@
 
                 $license = Read-Host "Please make your selection"
 
-                } until ($license -eq 1 -or $license -eq 2)
+            } until ($license -eq 1 -or $license -eq 2)
 
                 if ($license -eq 1){
 
-                Write-Host "you done chose yes"
+                    Write-Verbose "Checking available licenses"
+                    $LicenseType = Get-MsolAccountSku | Where-Object {$_.AccountSkuID -eq "reseller-account:O365_BUSINESS_PREMIUM"}
+                    $NumberOfLicenses = $LicenseType.ActiveUnits
+                    $ConsumedLicenses = $LicenseType.ConsumedUnits
+
+                    if (($NumberOfLicenses - $ConsumedLicenses) -ge 1) {
+
+                        Write-Verbose "Licensing User"
+
+                        Try {
+
+                            Set-MsolUserLicense -UserPrincipalName tempben@harcourtshamilton.co.nz -AddLicenses "reseller-account:O365_BUSINESS_PREMIUM"
+
+                        } Catch {
+
+                            Write-Warning "Unable to license user"
+                            Write-Warning "$Error[0]"
+
+                        }
+
+                    } else {
+
+                        Write-Warning "No spare licenses, please obtain more"
+
+                    }
 
                 }
 
