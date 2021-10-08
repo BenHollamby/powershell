@@ -883,7 +883,66 @@
 
         $object | Format-List
 
-    }
+        ########### licensing
+        Write-Host ''
+        Write-Host "Would you like to license the user now?"
+        write-host ''
+        Write-Host -ForegroundColor Yellow "================ Licensing =============="
+        Write-Host -ForegroundColor Yellow "Press '1' to license user."
+        Write-Host -ForegroundColor Yellow "Press '2' for no to exit."
+        Write-Host -ForegroundColor Yellow "================ Licensing =============="
+        Write-Host ''
+
+        $license = Read-Host "Please make your selection"
+
+        if ($license -eq 1){
+
+            Write-Host "you done chose yes"
+
+        }
+
+        elseif ($license -eq 2) {
+
+            write-host " im out"
+            break
+
+        }
+
+        elseif ($license -ne 1 -or $license -ne 2) {
+
+            Do {
+
+                Write-Host ''
+                Write-Warning "Not a valid selection"
+                Write-Host ''
+                Write-Host "Would you like to license the user now?"
+                Write-Host ''
+                Write-Host -ForegroundColor Yellow "================ Licensing =============="
+                Write-Host -ForegroundColor Yellow "Press '1' to license user."
+                Write-Host -ForegroundColor Yellow "Press '2' to exit."
+                Write-Host -ForegroundColor Yellow "================ Licensing =============="
+                Write-Host ''
+
+                $license = Read-Host "Please make your selection"
+
+                } until ($license -eq 1 -or $license -eq 2)
+
+                if ($license -eq 1){
+
+                Write-Host "you done chose yes"
+
+                }
+
+                elseif ($license -eq 2) {
+
+                    write-host " im out"
+                    break
+
+                }
+
+        }
+
+    } # END
 
 }
  
