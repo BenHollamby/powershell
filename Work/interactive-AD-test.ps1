@@ -860,6 +860,13 @@
 
         }
 
+        Write-Verbose "Syncing with Azure AD"
+        Try {
+            
+            Start-ADSyncSyncCycle -PolicyType Delta -ErrorAction SilentlyContinue} #Suppressed as don't need the error when I'm in my lab
+        
+        Catch {}
+
         Clear-Host
 
     }
