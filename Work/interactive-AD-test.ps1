@@ -946,7 +946,6 @@
 
         elseif ($license -eq 2) {
 
-            write-host " im out"
             break
 
         }
@@ -970,42 +969,41 @@
 
             } until ($license -eq 1 -or $license -eq 2)
 
-                if ($license -eq 1){
+            if ($license -eq 1){
 
-                    Write-Verbose "Checking available licenses"
-                    $LicenseType = Get-MsolAccountSku | Where-Object {$_.AccountSkuID -eq "reseller-account:O365_BUSINESS_PREMIUM"}
-                    $NumberOfLicenses = $LicenseType.ActiveUnits
-                    $ConsumedLicenses = $LicenseType.ConsumedUnits
+                Write-Verbose "Checking available licenses"
+                $LicenseType = Get-MsolAccountSku | Where-Object {$_.AccountSkuID -eq "reseller-account:O365_BUSINESS_PREMIUM"}
+                $NumberOfLicenses = $LicenseType.ActiveUnits
+                $ConsumedLicenses = $LicenseType.ConsumedUnits
 
-                    if (($NumberOfLicenses - $ConsumedLicenses) -ge 1) {
+                if (($NumberOfLicenses - $ConsumedLicenses) -ge 1) {
 
-                        Write-Verbose "Licensing User"
+                    Write-Verbose "Licensing User"
 
-                        Try {
+                    Try {
 
-                            Set-MsolUserLicense -UserPrincipalName tempben@harcourtshamilton.co.nz -AddLicenses "reseller-account:O365_BUSINESS_PREMIUM"
+                        Set-MsolUserLicense -UserPrincipalName tempben@harcourtshamilton.co.nz -AddLicenses "reseller-account:O365_BUSINESS_PREMIUM"
 
-                        } Catch {
+                    } Catch {
 
-                            Write-Warning "Unable to license user"
-                            Write-Warning "$Error[0]"
-
-                        }
-
-                    } else {
-
-                        Write-Warning "No spare licenses, please obtain more"
+                        Write-Warning "Unable to license user"
+                        Write-Warning "$Error[0]"
 
                     }
 
-                }
+                } else {
 
-                elseif ($license -eq 2) {
-
-                    write-host " im out"
-                    break
+                    Write-Warning "No spare licenses, please obtain more"
 
                 }
+
+            }
+
+            elseif ($license -eq 2) {
+
+                break
+
+            }
 
         }
 
