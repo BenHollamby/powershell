@@ -255,7 +255,6 @@ function New-SwarmUser {
 
                 } Catch {
 
-                    $Continue = $false
                     Write-Warning "Unable to create user $DisplayName"
                     Write-Warning "$Error[0]"
 
@@ -275,7 +274,6 @@ function New-SwarmUser {
 
                     } Catch {
 
-                        $Continue = $false
                         Write-Warning "Unable to add $NewUser to $Group group"
                         Write-Warning "Error[0]"
 
