@@ -286,20 +286,22 @@ function New-SwarmUser {
                 ####### End of User Memberships Section ######
                 ##############################################
 
-                $NewUserDetail = [PSCustomObject]@{
+                $Results = @()
 
-                    Name = $NewUser.Name
+                $Results += [PSCustomObject]@{
+
+                    Name         = $NewUser.Name
                     EmailAddress = $NewUser.UserPrincipalName
-                    UserName = $NewUser.SamAccountName
-                    Password = $RandomPassword
+                    UserName     = $NewUser.SamAccountName
+                    Password     = $RandomPassword
 
                 }
-
-                $NewUserDetail | Format-Table
 
             } #
 
         }
+
+        $Results | Select-Object Name, EmailAddress, UserName, Password
 
     }
 
