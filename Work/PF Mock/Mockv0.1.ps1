@@ -43,4 +43,31 @@ countryCode 554 | 036 (nz - aus respectively)
 9. 
 license with M365
 
+10. 
+Add user to intune_app_build group
+
+11.
+Confirm mailbox in EO
+Set datetime and region
+
+12.
+Onprem mail server session
+Enable-mailuser -identity user@swarm.com -externalemailaddress user@swarm.onmicrosoft.com
+Enable-remoteMailbox "Firstname Lastname" -remoteroutingaddress username@swarm.mail.onmicrosoft.com
+Confirm?
+
+13. 
+Send notification. Thinking just open a text file that helpdesk can copy and paste for now. 
+Once confirmed working well, automate the notification to Grant.
+
+Sequence
+Name
+Title
+Office | Country
+Department
+Manager
+work | mobile
+Employment Type
+Copy user
+
 #>
