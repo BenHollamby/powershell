@@ -26,3 +26,40 @@ function Test-InputData {
     } #End of InputData null block
 
 }
+
+
+####################################################################
+function Test-InputData {
+
+    [cmdletbinding()]
+
+    param (
+
+        [Parameter(
+                    Mandatory,
+                    ValueFromPipeline,
+                    ValueFromPipelineByPropertyName
+                    )]
+        [string]$Name
+
+    )
+
+    BEGIN {
+
+    }
+
+    PROCESS {
+
+        foreach ($i in $Name) {
+
+            write-host "$i in the pipe!"
+
+        } #End of Value From PipelineByPropertyName
+
+    }
+
+    END {
+
+    }
+
+}
