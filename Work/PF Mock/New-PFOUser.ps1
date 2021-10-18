@@ -145,23 +145,72 @@ function New-PFOUser {
                 $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
                 $Webpage              = "www.swarm.com"                                   #Variable for web page
 
+                #### Start of Country block ####
+
                 if ($Country -eq "New Zealand") {
 
-                    $OU    = "OU=Swarm Groups,OU=Swarm,DC=swarm,DC=com"
-                    $C     = "NZ"
-                    $CO    = "New Zealand"
-                    $CCode = "554"
+                    Write-Verbose "Country flagged as New Zealand"
 
-                }
+                    $OU    = "OU=Swarm Groups,OU=Swarm,DC=swarm,DC=com"                   #Sets OU to x 
+                    $C     = "NZ"                                                         #Sets C to NZ 
+                    $CO    = "New Zealand"                                                #Sets CO to New Zealand
+                    $CCode = "554"                                                        #Sets country code to NZ
+
+                } #end of Country is NZ block
 
                 elseif ($Country -eq "Australia") {
 
-                    $OU    = "OU=Swarm Users,OU=Swarm,DC=swarm,DC=com"
-                    $C     = "AU"
-                    $CO    = "Australia"
-                    $CCode = "036"
+                    Write-Verbose "Country flagged as Australia"
+
+                    $OU    = "OU=Swarm Users,OU=Swarm,DC=swarm,DC=com"                    #Sets OU to x 
+                    $C     = "AU"                                                         #Sets C to AU 
+                    $CO    = "Australia"                                                  #Sets Country to Australia
+                    $CCode = "036"                                                        #Sets country code to Australia 
+
+                } #end of Country is NZ block
+
+                #### End of Country block ####
+
+                #### Start of Manager Block ####
+
+                Write-Verbose " Checking Manager exists"
+
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                     #tests if manager exists with that name
+
+                    Write-Verbose "Assigning $Manager to variable"
+
+                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #If test is true sets ManagerIs variable
 
                 }
+
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                           #If test is false 
+
+                    Write-Warning "Unable to find $Manager in directory, please set manually after creation" #write warning
+                    $ManagerIs = $null                                                                       #Set ManagerIs to null
+
+                }
+
+                #### End of Manager block ####
+
+                #### Start of Permissions block ####
+
+                Write-Verbose "Checking $Permissions exists"
+
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {
+
+                    $GroupMemberShips = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}
+                    $Groups = (Get-ADUser $GroupMemberShips -Properties MemberOf).MemberOf
+
+                }
+
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {
+
+                    Write-Warning "$Permissions does not exist in the directory, please set groups manually"
+                    $Groups = $null
+
+                }
+
+                #### End of Permissions block ####
 
             } #end of if employment type is permanent block
 
@@ -225,6 +274,8 @@ function New-PFOUser {
                 $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
                 $Webpage              = "www.swarm.com"                                   #Variable for web page
                 
+                #### Country block ####
+
                 if ($Country -eq "New Zealand") {
 
                     Write-Verbose "Country flagged as New Zealand"
@@ -245,9 +296,90 @@ function New-PFOUser {
                     $CCode = "036"
 
                 }
+
+                #### End of Country block ###
+
+                #### Manager Block ######
+
+                Write-Verbose " Checking Manager exists"
+
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                     #tests if manager exists with that name
+
+                    Write-Verbose "Assigning $Manager to variable"
+
+                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #If test is true sets ManagerIs variable
+
+                }
+
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                           #If test is false 
+
+                    Write-Warning "Unable to find $Manager in directory, please set manually after creation" #write warning
+                    $ManagerIs = $null                                                                       #Set ManagerIs to null
+
+                }
+
+                #### End of manager block #####
                 
+                #### Start of Permissions block ####
+
+                Write-Verbose "Checking $Permissions exists"
+
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {
+
+                    $GroupMemberShips = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}
+                    $Groups = (Get-ADUser $GroupMemberShips -Properties MemberOf).MemberOf
+
+                }
+
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {
+
+                    Write-Warning "$Permissions does not exist in the directory, please set groups manually"
+                    $Groups = $null
+
+                }
+
+                #### End of Permissions block ####
+
             } #end of if employment type is contractor block
 
+            #### Random Password block ####
+
+            $Number = 12
+            $Count = 0
+            $RandomPassword = ""
+            while ($Count -ne $Number) {
+    
+                foreach($l in $Number) {
+    
+                    $Count += 1
+    
+                    $Characters = 33..126
+                    $Random = Get-Random $Characters
+                    $string = [char]$Random
+                    $RandomPassword += $string
+    
+                }
+    
+            }
+
+            $Password = ConvertTo-SecureString -AsPlainText $RandomPassword -Force
+
+            #### End of random password block ####
+
+            #### CREATE USER BLOCK #################################################################################
+
+            Try {
+
+                Write-Verbose "Attempting to create $DisplayName"
+                New-ADUser -Path $OU -Name $DisplayName -Title $Title -Office $Office -OfficePhone $WorkPhone -Company $Description -Description $Description -Department $Department -MobilePhone $Mobile -EmailAddress $EmailAddress -AccountPassword $Password -Enabled $true -DisplayName $DisplayName -GivenName $GivenName -Surname $Surname -UserPrincipalName $EmailAddress -SamAccountName $UserName -Manager $ManagerIs -ChangePasswordAtLogon $true -ErrorAction Stop
+
+            } Catch {
+
+                Write-Warning "Unable to create $DisplayName"
+
+            }
+
+            <#
             $GivenName
             $Surname
             $FirstName
@@ -275,7 +407,10 @@ function New-PFOUser {
             $Company
             $Description
             $Webpage
-            
+            $ManagerIs | Select-Object DistinguishedName
+            $Groups
+            #>
+
         } #end of foreach $i in $name block
 
     } #end of PROCESS block
