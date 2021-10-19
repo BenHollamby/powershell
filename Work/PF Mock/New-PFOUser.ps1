@@ -27,12 +27,14 @@ function New-PFOUser {
         [string]$Country = "New Zealand",
 
         [Parameter(
+                    Mandatory,
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
         [string]$Title,
 
         [Parameter(
+                    Mandatory,
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
@@ -51,6 +53,7 @@ function New-PFOUser {
         [string]$Manager,
 
         [Parameter(
+                    Mandatory,
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
@@ -473,11 +476,7 @@ function New-PFOUser {
             #### Configure ProxyAddresses ####
 
             <#
-           
-            $PrimarySMTP
-            $ProxyAddress1
-            $ProxyAddress2
-            $ProxyAddress3
+
             $MailUserIdentity
             $ExternalEmailAddress
             $RemoteMailbox
