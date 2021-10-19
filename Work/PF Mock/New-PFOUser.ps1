@@ -151,10 +151,11 @@ function New-PFOUser {
 
                     Write-Verbose "Country flagged as New Zealand"
 
-                    $OU    = "OU=Swarm Groups,OU=Swarm,DC=swarm,DC=com"                   #Sets OU to x 
-                    $C     = "NZ"                                                         #Sets C to NZ 
-                    $CO    = "New Zealand"                                                #Sets CO to New Zealand
-                    $CCode = "554"                                                        #Sets country code to NZ
+                    $OU                = "OU=Swarm Groups,OU=Swarm,DC=swarm,DC=com"       #Sets OU to x 
+                    $C                 = "NZ"                                             #Sets C to NZ 
+                    $CO                = "New Zealand"                                    #Sets CO to New Zealand
+                    $CCode             = "554"                                            #Sets country code to NZ
+                    $PreferredLanguage = "en-NZ"                                          #Sets preferred language to en-NZ             
 
                 } #end of Country is NZ block
 
@@ -162,10 +163,11 @@ function New-PFOUser {
 
                     Write-Verbose "Country flagged as Australia"
 
-                    $OU    = "OU=Swarm Users,OU=Swarm,DC=swarm,DC=com"                    #Sets OU to x 
-                    $C     = "AU"                                                         #Sets C to AU 
-                    $CO    = "Australia"                                                  #Sets Country to Australia
-                    $CCode = "036"                                                        #Sets country code to Australia 
+                    $OU                = "OU=Swarm Users,OU=Swarm,DC=swarm,DC=com"        #Sets OU to x 
+                    $C                 = "AU"                                             #Sets C to AU 
+                    $CO                = "Australia"                                      #Sets Country to Australia
+                    $CCode             = "036"                                            #Sets country code to Australia
+                    $PreferredLanguage = "en-AU"                                          #Sets preferred language to en-AU 
 
                 } #end of Country is NZ block
 
@@ -284,6 +286,7 @@ function New-PFOUser {
                     $C     = "NZ"
                     $CO    = "New Zealand"
                     $CCode = "554"
+                    $PreferredLanguage = "en-NZ"                                          #Sets preferred language to en-NZ
 
                 }
 
@@ -294,6 +297,7 @@ function New-PFOUser {
                     $C     = "AU"
                     $CO    = "Australia"
                     $CCode = "036"
+                    $PreferredLanguage = "en-AU"                                          #Sets preferred language to en-AU
 
                 }
 
@@ -382,26 +386,27 @@ function New-PFOUser {
 
                 $Arguments = @{
 
-                    Path = $OU
-                    Name = $DisplayName
-                    Title = $Title
-                    Office = $Office
-                    OfficePhone = $WorkPhone
-                    Company = $Description
-                    Description = $Description
-                    Department = $Department
-                    MobilePhone = $Mobile
-                    EmailAddress = $EmailAddress
-                    AccountPassword = $PasswordWillBe
-                    Enabled = $true
-                    DisplayName = $DisplayName
-                    GivenName = $GivenName
-                    Surname = $Surname
-                    UserPrincipalName = $UserName
-                    SamAccountName = $UserName
-                    Manage = $ManagerIs
+                    Path                  = $OU
+                    Name                  = $DisplayName
+                    Title                 = $Title
+                    Office                = $Office
+                    OfficePhone           = $WorkPhone
+                    Company               = $Description
+                    Description           = $Description
+                    Department            = $Department
+                    Country               = $C
+                    MobilePhone           = $Mobile
+                    EmailAddress          = $EmailAddress
+                    AccountPassword       = $PasswordWillBe
+                    Enabled               = $true
+                    DisplayName           = $DisplayName
+                    GivenName             = $GivenName
+                    Surname               = $Surname
+                    UserPrincipalName     = $UserName
+                    SamAccountName        = $UserName
+                    Manage                = $ManagerIs
                     ChangePasswordAtLogon = $true
-                    ErrorAction = "Stop"
+                    ErrorAction           = "Stop"
 
                 }
 
@@ -418,7 +423,7 @@ function New-PFOUser {
             
             ##### Permissions ####
 
-            $NewUser = Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$DisplayName"}
+            $NewUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}
 
                 foreach ($Group in $Groups) {
                     
@@ -435,6 +440,38 @@ function New-PFOUser {
 
                 }
 
+            ##### End of Permissions ####
+
+            ##### Configure attributes ####
+
+            Try {
+
+                Set-ADObject -Identity $NewUser.DistinguishedName -Replace @{preferredLanguage = "$PreferredLanguage";
+                                                                             co = $CO;
+                                                                             countryCode = $CCode;
+                                                                             wWWHomePage = "www.swarm.com"
+                                                                             } -ErrorAction Stop
+                                                                                                
+            } Catch {
+
+                Write-Warning "Unable to set language, country, country code, and webpage, please set manually."
+
+            }
+
+            #### End of Configure Attributes ####
+
+            Try {
+
+                Set-ADUser -Identity $NewUser.DistinguishedName -add @{ProxyAddresses = "SMTP:$PrimarySMTP,smtp:$ProxyAddress1,smtp:$ProxyAddress2,smtp:$ProxyAddress3" -split ","} -ErrorAction Stop
+
+            } Catch {
+
+                Write-Warning "Unable to set proxy addresses"
+
+            }
+
+            #### Configure ProxyAddresses ####
+
             <#
            
             $PrimarySMTP
@@ -445,13 +482,7 @@ function New-PFOUser {
             $ExternalEmailAddress
             $RemoteMailbox
             $RemoteRoutingAddress
-            
-            $C
-            $CO
-            $CCode
-           
-            $Webpage
-           
+          
             #>
 
 
