@@ -344,40 +344,55 @@ function New-PFOUser {
 
             #### Random Password block ####
 
-            $Number = 12
-            $Count = 0
-            $RandomPassword = ""
-            while ($Count -ne $Number) {
+            if (-not($Password)) {
+
+                $Number = 12
+                $Count = 0
+                $RandomPassword = ""
+                while ($Count -ne $Number) {
     
-                foreach($l in $Number) {
+                    foreach($l in $Number) {
     
-                    $Count += 1
+                        $Count += 1
     
-                    $Characters = 33..126
-                    $Random = Get-Random $Characters
-                    $string = [char]$Random
-                    $RandomPassword += $string
+                        $Characters = 33..126
+                        $Random = Get-Random $Characters
+                        $string = [char]$Random
+                        $RandomPassword += $string
+    
+                    }
     
                 }
-    
-            }
 
-            $Password = ConvertTo-SecureString -AsPlainText $RandomPassword -Force
+                $PasswordIs = $RandomPassword
+
+             }
+
+             elseif ($Password) {
+
+                 $PasswordIs = $Password
+
+             }
+
+             $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)
 
             #### End of random password block ####
 
             #### CREATE USER BLOCK #################################################################################
 
+            
             Try {
 
                 Write-Verbose "Attempting to create $DisplayName"
-                New-ADUser -Path $OU -Name $DisplayName -Title $Title -Office $Office -OfficePhone $WorkPhone -Company $Description -Description $Description -Department $Department -MobilePhone $Mobile -EmailAddress $EmailAddress -AccountPassword $Password -Enabled $true -DisplayName $DisplayName -GivenName $GivenName -Surname $Surname -UserPrincipalName $EmailAddress -SamAccountName $UserName -Manager $ManagerIs -ChangePasswordAtLogon $true -ErrorAction Stop
+                New-ADUser -Path $OU -Name $DisplayName -Title $Title -Office $Office -OfficePhone $WorkPhone -Company $Description -Description $Description -Department $Department -MobilePhone $Mobile -EmailAddress $EmailAddress -AccountPassword $PasswordWillBe -Enabled $true -DisplayName $DisplayName -GivenName $GivenName -Surname $Surname -UserPrincipalName $EmailAddress -SamAccountName $UserName -Manager $ManagerIs -ChangePasswordAtLogon $true -ErrorAction Stop
 
             } Catch {
 
                 Write-Warning "Unable to create $DisplayName"
 
             }
+            
+            
 
             <#
             $GivenName
@@ -409,7 +424,9 @@ function New-PFOUser {
             $Webpage
             $ManagerIs | Select-Object DistinguishedName
             $Groups
+            $Password
             #>
+
 
         } #end of foreach $i in $name block
 
