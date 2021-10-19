@@ -380,9 +380,6 @@ function New-PFOUser {
 
             #### CREATE USER BLOCK #################################################################################
 
-            
-            Try {
-
                 $Arguments = @{
 
                     Path = $OU
@@ -408,6 +405,8 @@ function New-PFOUser {
 
                 }
 
+            Try {
+
                 Write-Verbose "Attempting to create $DisplayName"
                 New-ADUser @Arguments
 
@@ -417,16 +416,27 @@ function New-PFOUser {
 
             }
             
-            
+            ##### Permissions ####
+
+            $NewUser = Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$DisplayName"}
+
+                foreach ($Group in $Groups) {
+                    
+                    Try {
+
+                        Write-Verbose "Assigning $NewUser to $Group Group"
+                        Add-ADGroupMember -Identity $Group -Members $NewUser -ErrorAction Stop
+
+                    } Catch {
+
+                        Write-Warning "Unable to add $NewUser to $Group group"
+
+                    }
+
+                }
 
             <#
-            $GivenName
-            $Surname
-            $FirstName
-            $LastName
-            $DisplayName
-            $UserName
-            $EmailAddress
+           
             $PrimarySMTP
             $ProxyAddress1
             $ProxyAddress2
@@ -435,21 +445,13 @@ function New-PFOUser {
             $ExternalEmailAddress
             $RemoteMailbox
             $RemoteRoutingAddress
-            $Title
-            $Department
-            $Office
-            $WorkPhone
-            $Mobile
-            $OU
+            
             $C
             $CO
             $CCode
-            $Company
-            $Description
+           
             $Webpage
-            $ManagerIs | Select-Object DistinguishedName
-            $Groups
-            $Password
+           
             #>
 
 
