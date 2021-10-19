@@ -383,8 +383,33 @@ function New-PFOUser {
             
             Try {
 
+                $Arguments = @{
+
+                    Path = $OU
+                    Name = $DisplayName
+                    Title = $Title
+                    Office = $Office
+                    OfficePhone = $WorkPhone
+                    Company = $Description
+                    Description = $Description
+                    Department = $Department
+                    MobilePhone = $Mobile
+                    EmailAddress = $EmailAddress
+                    AccountPassword = $PasswordWillBe
+                    Enabled = $true
+                    DisplayName = $DisplayName
+                    GivenName = $GivenName
+                    Surname = $Surname
+                    UserPrincipalName = $UserName
+                    SamAccountName = $UserName
+                    Manage = $ManagerIs
+                    ChangePasswordAtLogon = $true
+                    ErrorAction = "Stop"
+
+                }
+
                 Write-Verbose "Attempting to create $DisplayName"
-                New-ADUser -Path $OU -Name $DisplayName -Title $Title -Office $Office -OfficePhone $WorkPhone -Company $Description -Description $Description -Department $Department -MobilePhone $Mobile -EmailAddress $EmailAddress -AccountPassword $PasswordWillBe -Enabled $true -DisplayName $DisplayName -GivenName $GivenName -Surname $Surname -UserPrincipalName $EmailAddress -SamAccountName $UserName -Manager $ManagerIs -ChangePasswordAtLogon $true -ErrorAction Stop
+                New-ADUser @Arguments
 
             } Catch {
 
