@@ -1,5 +1,26 @@
 function New-PFOUser {
 
+    <#
+    .SYNOPSIS
+    New-PFOUser will create a new Pxxxx user and formats names into values aligning with the environment
+    .DESCRIPTION
+    Creates a new user. You can either pass through a CSV file with the bare minimum of properties, such as Name,
+    Title, and Department. With the bare minimum parameters, it will assume a NZ user on a permanent contract,
+    and create a 12 character random string as the password.
+    You may create 
+    .PARAMETER VMName
+    Mandatory
+    Names the VM
+    .PARAMETER Number
+    Optional
+    Set to 4 GB. Need to change this to a more friendly GB version
+    .PARAMETER Processors
+    Optional
+    Sets number of processors. Defaults set to 4 processors.
+    .EXAMPLE
+    New-SwarmHVVM
+    #>
+
     [cmdletbinding()]
 
     param (
@@ -546,28 +567,7 @@ function New-PFOUser {
 
         } #end of foreach $i in $name block
 
-        Try {
-
-            $ADSync = Invoke-Command -ComputerName SWADFS01 -ScriptBlock {Start-ADSyncSync -PolicyType Delta} -ErrorAction Stop        #Invokes AD Sync tool from ADFS server and assigns result to variable
-
-            if ($ADSync.Result -eq "Succcess") {                                                                                       #If sync successful
-
-                Write-Output "Sync with SWADFS01 was successful"
-                Write-Output "Please wait a few minutes for user to create in Azure AD"
-
-            }
-
-            else {
-
-                Write-Warning "Sync was unsuccessful, please try manually"
-
-            }
-
-        } Catch {
-
-            Write-Warning "Unable to sync with Azure AD, please wait up to 30mins or force a sync from SWADFS01"
-
-        }
+        
 
         $UserObjects | Select-Object Name, Email, Username, Password                                                                    #Outputs Name, Email Address, UserName and Password
         
