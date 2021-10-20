@@ -8,20 +8,22 @@ function New-PFOUser {
                     Mandatory,
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName,
-                    HelpMessage = 'Please enter a name in a firstname lastname format, with a space,  in quotes like "lord vader"'
+                    HelpMessage = 'Please enter a name in a firstname lastname format, with a space,  in quotes like "john doe"'
                     )]
         [string]$Name,
 
         [Parameter(
                     ValueFromPipeline,
-                    ValueFromPipelineByPropertyName
+                    ValueFromPipelineByPropertyName,
+                    HelpMessage = 'Please use tab complete to select either Permanent or Contractor'
                     )]
         [ArgumentCompleter({'Permanent', 'Contractor'})]
         [string]$EmploymentType = "Permanent",
 
         [Parameter(
                     ValueFromPipeline,
-                    ValueFromPipelineByPropertyName
+                    ValueFromPipelineByPropertyName,
+                    HelpMessage = 'Please use tab complete to select either "New Zealand" or Australia'
                     )]
         [ArgumentCompleter({'"New Zealand"', "Australia"})]
         [string]$Country = "New Zealand",
@@ -29,7 +31,8 @@ function New-PFOUser {
         [Parameter(
                     Mandatory,
                     ValueFromPipeline,
-                    ValueFromPipelineByPropertyName
+                    ValueFromPipelineByPropertyName,
+                    HelpMessage = 'Title is mandatory'
                     )]
         [string]$Title,
 
@@ -53,7 +56,6 @@ function New-PFOUser {
         [string]$Manager,
 
         [Parameter(
-                    Mandatory,
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
@@ -178,10 +180,6 @@ function New-PFOUser {
                 $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
                 $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
                 $ProxyAddress3        = "$FirstName.$LastName@swarm.co.nz"                #proxy address first name last name .co.nz
-                $MailUserIdentity     = $EmailAddress                                     #Variable for -Identity for enable-mailuser
-                $ExternalEmailAddress = "$FirstName.$LastName@swarm.onmicrosoft.com"      #variable for externalemailaddress for enable-mailuser
-                $RemoteMailbox        = $DisplayName                                      #variable for Enable-RemoteMailbox on prem   
-                $RemoteRoutingAddress = "$UserName@swarm.mail.onmicrosoft.com"            #variable for -remoteroutingaddress
                 $WPhone1              = $Workphone.substring(0,2)                         #Split area code
                 $WPhone2              = $Workphone.substring(2,3)                         #First three digits after area code  
                 $WPhone3              = $Workphone.substring(5)                           #Remaining digits  
@@ -309,10 +307,6 @@ function New-PFOUser {
                 $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
                 $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
                 $ProxyAddress3        = "$FirstName.$LastName@swarm.co.nz"                #proxy address first name last name .co.nz
-                $MailUserIdentity     = $EmailAddress                                     #Variable for -Identity for enable-mailuser
-                $ExternalEmailAddress = "$FirstName.$LastName@swarm.onmicrosoft.com"      #variable for externalemailaddress for enable-mailuser
-                $RemoteMailbox        = $DisplayName                                      #variable for Enable-RemoteMailbox on prem   
-                $RemoteRoutingAddress = "$UserName@swarm.mail.onmicrosoft.com"            #variable for -remoteroutingaddress
                 $WPhone1              = $Workphone.substring(0,2)                         #Split area code
                 $WPhone2              = $Workphone.substring(2,3)                         #First three digits after area code  
                 $WPhone3              = $Workphone.substring(5)                           #Remaining digits  
@@ -462,7 +456,7 @@ function New-PFOUser {
                 Set-ADObject -Identity $NewUser.DistinguishedName -Replace @{preferredLanguage = "$PreferredLanguage";
                                                                              co = $CO;
                                                                              countryCode = $CCode;
-                                                                             wWWHomePage = "www.swarm.com"
+                                                                             wWWHomePage = $Webpage
                                                                              } -ErrorAction Stop
                                                                                                 
             } Catch {
