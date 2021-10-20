@@ -117,7 +117,6 @@ function New-PFOUser {
 
              }
 
-             $PasswordIs
              $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)
 
             #### End of random password block ####
@@ -416,7 +415,7 @@ function New-PFOUser {
                     DisplayName           = $DisplayName
                     GivenName             = $GivenName
                     Surname               = $Surname
-                    UserPrincipalName     = $UserName
+                    UserPrincipalName     = $ProxyAddress1
                     SamAccountName        = $UserName
                     Manage                = $ManagerIs
                     ChangePasswordAtLogon = $true
