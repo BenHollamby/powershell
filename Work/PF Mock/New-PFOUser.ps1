@@ -69,13 +69,58 @@ function New-PFOUser {
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
-        [string]$Permissions
+        [string]$Permissions,
+
+        [Parameter(
+                    ValueFromPipeline,
+                    ValueFromPipelineByPropertyName
+                    )]
+        [string]$Password
 
     )
 
     BEGIN {
 
         Write-Verbose "Start of BEGIN block by $env:USERNAME"
+
+            #### Random Password block ####
+
+            if (-not($Password)) {
+
+                $Number = 12
+                $Count = 0
+                $RandomPassword = ""
+                while ($Count -ne $Number) {
+    
+                    foreach($l in $Number) {
+    
+                        $Count += 1
+    
+                        $Characters = 33..126
+                        $Random = Get-Random $Characters
+                        $string = [char]$Random
+                        $RandomPassword += $string
+    
+                    }
+    
+                }
+
+                $PasswordIs = $RandomPassword
+
+            }
+
+
+
+             elseif ($Password) {
+
+                 $PasswordIs = $Password
+
+             }
+
+             $PasswordIs
+             $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)
+
+            #### End of random password block ####
 
     } #end of BEGIN block
 
@@ -349,41 +394,7 @@ function New-PFOUser {
 
             } #end of if employment type is contractor block
 
-            #### Random Password block ####
 
-            if (-not($Password)) {
-
-                $Number = 12
-                $Count = 0
-                $RandomPassword = ""
-                while ($Count -ne $Number) {
-    
-                    foreach($l in $Number) {
-    
-                        $Count += 1
-    
-                        $Characters = 33..126
-                        $Random = Get-Random $Characters
-                        $string = [char]$Random
-                        $RandomPassword += $string
-    
-                    }
-    
-                }
-
-                $PasswordIs = $RandomPassword
-
-             }
-
-             elseif ($Password) {
-
-                 $PasswordIs = $Password
-
-             }
-
-             $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)
-
-            #### End of random password block ####
 
             #### CREATE USER BLOCK #################################################################################
 
