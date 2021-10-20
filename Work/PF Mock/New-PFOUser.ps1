@@ -39,7 +39,8 @@ function New-PFOUser {
         [Parameter(
                     Mandatory,
                     ValueFromPipeline,
-                    ValueFromPipelineByPropertyName
+                    ValueFromPipelineByPropertyName,
+                    HelpMessage = 'Title is mandatory'
                     )]
         [string]$Department,
 
@@ -497,11 +498,12 @@ function New-PFOUser {
             Try {
 
                 Write-Verbose "Setting ADObjects for $NewUser"
-                Set-ADObject -Identity $NewUser.DistinguishedName -Replace @{preferredLanguage = "$PreferredLanguage";   #Sets Preferred Language
-                                                                             co = $CO;                                   #Sets Country
-                                                                             countryCode = $CCode;                       #Sets Country Code
-                                                                             wWWHomePage = $Webpage                      #Sets Webpage
-                                                                             } -ErrorAction Stop
+                Set-ADObject -Identity $NewUser.DistinguishedName `
+                    -Replace @{preferredLanguage = "$PreferredLanguage";                        #Sets Preferred Language
+                                              co = $CO;                                         #Sets Country
+                                     countryCode = $CCode;                                      #Sets Country Code
+                                     wWWHomePage = $Webpage                                     #Sets Webpage
+                               } -ErrorAction Stop
                                                                                                 
             } Catch {
 
@@ -513,9 +515,13 @@ function New-PFOUser {
             #################### END OF CONFIGURE ATTRIBUTES ############################
             #############################################################################
 
+            #############################################################################
+            #################### CONFIGURE PROXY ADDRESSES ##############################
+            #############################################################################
+
             Try {
 
-                Set-ADUser -Identity $NewUser.DistinguishedName -add @{ProxyAddresses = "SMTP:$PrimarySMTP,smtp:$ProxyAddress1,smtp:$ProxyAddress2,smtp:$ProxyAddress3" -split ","} -ErrorAction Stop #Sets Proxy addresses
+                Set-ADUser -Identity $NewUser.DistinguishedName -add @{ProxyAddresses = "SMTP:$PrimarySMTP,smtp:$ProxyAddress1,smtp:$ProxyAddress2,smtp:$ProxyAddress3" -split ","} -ErrorAction Stop  #Sets Proxy addresses                                           
 
             } Catch {
 
@@ -524,7 +530,7 @@ function New-PFOUser {
             }
 
             #############################################################################
-            #################### CONFIGURE PROXY ADDRESSES ##############################
+            ################# END OF CONFIGURE PROXY ADDRESSES ##########################
             #############################################################################
 
             $UserObjects = @()
@@ -540,7 +546,30 @@ function New-PFOUser {
 
         } #end of foreach $i in $name block
 
-        $UserObjects | Select-Object Name, Email, Username, Password                     #Outputs Name, Email Address, UserName and Password
+        Try {
+
+            $ADSync = Invoke-Command -ComputerName SWADFS01 -ScriptBlock {Start-ADSyncSync -PolicyType Delta} -ErrorAction Stop        #Invokes AD Sync tool from ADFS server and assigns result to variable
+
+            if ($ADSync.Result -eq "Succcess") {                                                                                       #If sync successful
+
+                Write-Output "Sync with SWADFS01 was successful"
+                Write-Output "Please wait a few minutes for user to create in Azure AD"
+
+            }
+
+            else {
+
+                Write-Warning "Sync was unsuccessful, please try manually"
+
+            }
+
+        } Catch {
+
+            Write-Warning "Unable to sync with Azure AD, please wait up to 30mins or force a sync from SWADFS01"
+
+        }
+
+        $UserObjects | Select-Object Name, Email, Username, Password                                                                    #Outputs Name, Email Address, UserName and Password
         
     } #end of PROCESS block
 
@@ -549,3 +578,4 @@ function New-PFOUser {
     } #end of END block
 
 }
+
