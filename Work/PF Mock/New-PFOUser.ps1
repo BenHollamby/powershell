@@ -85,10 +85,14 @@ function New-PFOUser {
 
         Write-Verbose "Start of BEGIN block by $env:USERNAME"
 
-            #### Random Password block ####
+            ##########################################################################################
+            ################# Random Password block ##################################################
+            ##########################################################################################
 
-            if (-not($Password)) {
-
+            if (-not($Password)) {                                                                     #If password parameter not used
+            
+                Write-Verbose "-Password parameter not used, generating random 12 character password "                                                    
+                                                                
                 $Number = 12
                 $Count = 0
                 $RandomPassword = ""
@@ -96,32 +100,33 @@ function New-PFOUser {
     
                     foreach($l in $Number) {
     
-                        $Count += 1
-    
+                        $Count += 1                             
                         $Characters = 33..126
                         $Random = Get-Random $Characters
                         $string = [char]$Random
-                        $RandomPassword += $string
+                        $RandomPassword += $string                                                      #While loop creates 12 character password 
     
-                    }
+                    } #end of foreach block
     
-                }
+                } #end of while block
 
-                $PasswordIs = $RandomPassword
+                $PasswordIs = $RandomPassword                                                           #Assigns randomly generated password to PasswordIs Variable 
 
             }
 
+             elseif ($Password) {                                                                       #if password parameter is used
 
+                Write-Verbose "Password parameter used, assigning to Password Is variable"
 
-             elseif ($Password) {
-
-                 $PasswordIs = $Password
+                 $PasswordIs = $Password                                                                #Assigns password to PasswordIs Variable
 
              }
 
-             $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)
+             $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)                 #Converts password to secure string
 
-            #### End of random password block ####
+            #############################################################################
+            ###################### End of random password block #########################
+            #############################################################################
 
     } #end of BEGIN block
 
@@ -190,7 +195,9 @@ function New-PFOUser {
                 $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
                 $Webpage              = "www.swarm.com"                                   #Variable for web page
 
-                #### Start of Country block ####
+                #############################################################################
+                ####################### Start of Country block ##############################
+                #############################################################################
 
                 if ($Country -eq "New Zealand") {
 
@@ -216,48 +223,57 @@ function New-PFOUser {
 
                 } #end of Country is NZ block
 
-                #### End of Country block ####
+                #############################################################################
+                ######################## End of Country block ###############################
+                #############################################################################
 
-                #### Start of Manager Block ####
+                #############################################################################
+                ####################### Start of Manager Block ##############################
+                #############################################################################
 
                 Write-Verbose " Checking Manager exists"
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                     #tests if manager exists with that name
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                          #tests if manager exists with that name
 
                     Write-Verbose "Assigning $Manager to variable"
-
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #If test is true sets ManagerIs variable
+                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #Set Manager to ManagerIs variable if true
 
                 }
 
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                           #If test is false 
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                #If Manager does not exist 
 
                     Write-Warning "Unable to find $Manager in directory, please set manually after creation" #write warning
                     $ManagerIs = $null                                                                       #Set ManagerIs to null
 
                 }
 
-                #### End of Manager block ####
+                #############################################################################
+                ######################## End of Manager block ###############################
+                #############################################################################
 
-                #### Start of Permissions block ####
+                #############################################################################
+                ##################### Start of Permissions block ############################
+                #############################################################################
 
                 Write-Verbose "Checking $Permissions exists"
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {                       #If user exists in directory
 
-                    $GroupMemberShips = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}
-                    $Groups = (Get-ADUser $GroupMemberShips -Properties MemberOf).MemberOf
+                    $GroupMemberShips = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}      #Get User and assign to variable
+                    $Groups = (Get-ADUser $GroupMemberShips -Properties MemberOf).MemberOf                    #Assign all groups to a variable    
 
                 }
 
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {             #If user does not exist in directory
 
                     Write-Warning "$Permissions does not exist in the directory, please set groups manually"
-                    $Groups = $null
+                    $Groups = $null                                                                           #Sets Groups variable to null
 
                 }
 
-                #### End of Permissions block ####
+                #############################################################################
+                ###################### End of Permissions block #############################
+                #############################################################################
 
             } #end of if employment type is permanent block
 
@@ -317,55 +333,65 @@ function New-PFOUser {
                 $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
                 $Webpage              = "www.swarm.com"                                   #Variable for web page
                 
-                #### Country block ####
+                #############################################################################
+                ####################### Start of Country block ##############################
+                #############################################################################
 
-                if ($Country -eq "New Zealand") {
+                if ($Country -eq "New Zealand") {                                         #If country NZ 
 
                     Write-Verbose "Country flagged as New Zealand"
 
-                    $OU    = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"
-                    $C     = "NZ"
-                    $CO    = "New Zealand"
-                    $CCode = "554"
+                    $OU    = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"              #Sets OU to NZ OU
+                    $C     = "NZ"                                                         #Sets Country to NZ
+                    $CO    = "New Zealand"                                                #Sets Country to New Zealand
+                    $CCode = "554"                                                        #Sets Country Code to NZ
                     $PreferredLanguage = "en-NZ"                                          #Sets preferred language to en-NZ
 
                 }
 
-                elseif ($Country -eq "Australia") {
+                elseif ($Country -eq "Australia") {                                       #If country Australia  
 
-                    Write-Verbose "Country flagged as Australia"
-                    $OU    = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"
-                    $C     = "AU"
-                    $CO    = "Australia"
-                    $CCode = "036"
+                    Write-Verbose "Country flagged as Australia"                          
+                    $OU    = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"              #Sets OU to Australian Users
+                    $C     = "AU"                                                         #Sets Country to AU
+                    $CO    = "Australia"                                                  #Sets Country to Australia  
+                    $CCode = "036"                                                        #Sets Country Code to Australia  
                     $PreferredLanguage = "en-AU"                                          #Sets preferred language to en-AU
 
                 }
 
-                #### End of Country block ###
+                #############################################################################
+                ####################### End of Country block ################################
+                #############################################################################
 
-                #### Manager Block ######
+                #############################################################################
+                ####################### Start of Manager Block ##############################
+                #############################################################################
 
                 Write-Verbose " Checking Manager exists"
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                     #tests if manager exists with that name
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                          #If manager exists in directory
 
                     Write-Verbose "Assigning $Manager to variable"
 
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #If test is true sets ManagerIs variable
+                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #If Manager exists, assigned to ManagerIs variable
 
                 }
 
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                           #If test is false 
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                #If Manager does not exist
 
                     Write-Warning "Unable to find $Manager in directory, please set manually after creation" #write warning
                     $ManagerIs = $null                                                                       #Set ManagerIs to null
 
                 }
 
-                #### End of manager block #####
+                #############################################################################
+                ######################## End of Manager Block ###############################
+                #############################################################################
                 
-                #### Start of Permissions block ####
+                #############################################################################
+                ##################### Start of Permissions block ############################
+                #############################################################################
 
                 Write-Verbose "Checking $Permissions exists"
 
@@ -383,15 +409,18 @@ function New-PFOUser {
 
                 }
 
-                #### End of Permissions block ####
+                #############################################################################
+                ##################### End of Permissions block ##############################
+                #############################################################################
 
             } #end of if employment type is contractor block
 
 
+            #############################################################################
+            ######################## CREATE USER BLOCK ##################################
+            #############################################################################
 
-            #### CREATE USER BLOCK #################################################################################
-
-                $Arguments = @{
+                $Arguments = @{                                                 #Sets all the parameter arguments for New-ADUser
 
                     Path                  = $OU
                     Name                  = $DisplayName
@@ -420,24 +449,34 @@ function New-PFOUser {
             Try {
 
                 Write-Verbose "Attempting to create $DisplayName"
-                New-ADUser @Arguments
+                New-ADUser @Arguments                                                            #Create new user with arguments splatt
 
             } Catch {
 
                 Write-Warning "Unable to create $DisplayName"
 
             }
+
+            #############################################################################
+            ###################### END OF CREATE USER BLOCK #############################
+            #############################################################################
             
-            ##### Permissions ####
+            #############################################################################
+            ######################### PERMISSIONS BLOCK #################################
+            #############################################################################
 
-            $NewUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}
+            $NewUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}          #Assign newly created user to NewUser Variable 
+            
+            Write-Verbose "$NewUser assigned to NewUser variable"
 
-                foreach ($Group in $Groups) {
+                foreach ($Group in $Groups) {                                                    #Iterating through each user group
+
+                    Write-Verbose "Grabbing $Group"
                     
                     Try {
 
                         Write-Verbose "Assigning $NewUser to $Group Group"
-                        Add-ADGroupMember -Identity $Group -Members $NewUser -ErrorAction Stop
+                        Add-ADGroupMember -Identity $Group -Members $NewUser -ErrorAction Stop   #Assigning group to user
 
                     } Catch {
 
@@ -447,16 +486,21 @@ function New-PFOUser {
 
                 }
 
-            ##### End of Permissions ####
+            #############################################################################
+            ################### END OF PERMISSIONS BLOCK ################################
+            #############################################################################
 
-            ##### Configure attributes ####
+            #############################################################################
+            ################### CONFIGURE ATTRIBUTES ####################################
+            #############################################################################
 
             Try {
 
-                Set-ADObject -Identity $NewUser.DistinguishedName -Replace @{preferredLanguage = "$PreferredLanguage";
-                                                                             co = $CO;
-                                                                             countryCode = $CCode;
-                                                                             wWWHomePage = $Webpage
+                Write-Verbose "Setting ADObjects for $NewUser"
+                Set-ADObject -Identity $NewUser.DistinguishedName -Replace @{preferredLanguage = "$PreferredLanguage";   #Sets Preferred Language
+                                                                             co = $CO;                                   #Sets Country
+                                                                             countryCode = $CCode;                       #Sets Country Code
+                                                                             wWWHomePage = $Webpage                      #Sets Webpage
                                                                              } -ErrorAction Stop
                                                                                                 
             } Catch {
@@ -465,11 +509,13 @@ function New-PFOUser {
 
             }
 
-            #### End of Configure Attributes ####
+            #############################################################################
+            #################### END OF CONFIGURE ATTRIBUTES ############################
+            #############################################################################
 
             Try {
 
-                Set-ADUser -Identity $NewUser.DistinguishedName -add @{ProxyAddresses = "SMTP:$PrimarySMTP,smtp:$ProxyAddress1,smtp:$ProxyAddress2,smtp:$ProxyAddress3" -split ","} -ErrorAction Stop
+                Set-ADUser -Identity $NewUser.DistinguishedName -add @{ProxyAddresses = "SMTP:$PrimarySMTP,smtp:$ProxyAddress1,smtp:$ProxyAddress2,smtp:$ProxyAddress3" -split ","} -ErrorAction Stop #Sets Proxy addresses
 
             } Catch {
 
@@ -477,20 +523,25 @@ function New-PFOUser {
 
             }
 
-            #### Configure ProxyAddresses ####
+            #############################################################################
+            #################### CONFIGURE PROXY ADDRESSES ##############################
+            #############################################################################
 
-            <#
+            $UserObjects = @()
 
-            $MailUserIdentity
-            $ExternalEmailAddress
-            $RemoteMailbox
-            $RemoteRoutingAddress
-          
-            #>
+            $UserObjects += [PSCustomObject] @{                                          #Creates a custom Powershell object into array for outputting new user information like username password etc
 
+                            Name = $NewUser.Name                                         #Name of user
+                            Email = (Get-ADUser $NewUser -Properties *).EmailAddress     #Email address of user
+                            Username = $NewUser.SamAccountName                           #Username 
+                            Password = $PasswordIs                                       #Password
+
+                           }
 
         } #end of foreach $i in $name block
 
+        $UserObjects | Select-Object Name, Email, Username, Password                     #Outputs Name, Email Address, UserName and Password
+        
     } #end of PROCESS block
 
     END {
