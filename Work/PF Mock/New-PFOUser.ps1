@@ -5,10 +5,13 @@ function New-PFOUser {
     New-PFOUser will create a new Pxxxx user with all the domain specific attributes and assigns them.
     .DESCRIPTION
     Creates a new user. You can either pass through a CSV file with the bare minimum of properties, such as Name,
-    Title, and Department, Manager and Permissions, or can extend it to have more attributes.
+    Title, Department, Manager and Permissions, or can extend it to have more attributes.
 
     Alternatively, you can create a new user with parameters, running the command will force you to enter the
     mandatory parameters.
+
+    For familiar users, you do not need to state the mandatory parameters. Run help New-PFOUser -examples
+    for an example. 
 
     If you use the bare minimum parameters, New-PFOUser will assume that the user is based in NZ, and is a
     permanent employee.
@@ -21,12 +24,40 @@ function New-PFOUser {
     Takes a name in a "firstname lastname" format, and will put out a GivenName, Surname, FirstName
     LastName, DisplayName, UserName, EmailAddress, PrimarySMTP, and three proxy addresses that are in the
     firstname.lastname@xxxxx.com, firstname.lastname@xxxxx.co.nz, username@xxxxx.com, and username@xxxxx.com.
-    .PARAMETER Number
-    Optional
-    Set to 4 GB. Need to change this to a more friendly GB version
-    .PARAMETER Processors
-    Optional
-    Sets number of processors. Defaults set to 4 processors.
+    It will also capitalise the name if lowercase is used.
+    When it sets the username, if the employee is flagged as a permanent employee it will take the first
+    four characters of the last name and the first character of the first name and create a username.
+    If the user has been flagged as a contractor, there will be an _ placed between the first
+    four characters of the last name and the first character of the first name.
+    If a last name is less than four characters, sequential characters from the first name will be used
+    to pad the username to five characters.
+    .PARAMETER Title
+    Takes the title and captialises if lowercase was used.
+    .PARAMETER Department
+    Takes the department and captialises if lowercase was used.
+    .PARAMETER Manager
+    Takes a name in a "firstname lastname" format, and will check active directory, and if the user
+    exists, will set the manager of the new user.
+    .PARAMETER Permissions
+    Takes a name in a "firstname lastname" format, and will check active directory, and if the user
+    exists, will assign all groups that user is a member of and assign them to your new user.
+    .PARAMETER Password
+    Completely optional. If not used, a 12 character random string will be generated and supplied
+    with the new user details.
+    .PARAMETER EmploymentType
+    Tab complete for Permanent or Contractor. If the parameter is not used, EmploymentType has a default
+    value of Permanent. If user is flagged as a contractor, the Organisational Unit will be set as
+    <OU PATH>.
+    .PARAMETER Country
+    Tab complete for Australia or New Zealand. If the parameter is not used, the country parameter
+    has a default value of New Zealand, and will set the Organisational Unit to <OU PATH>. If the
+    country is set to Australia, the Organisational Unit will be set to <OU PATH>.
+    .PARAMETER Office
+    Takes the office name and captialises if lowercase was used.
+    .PARAMETER WorkPhone
+    Takes the WorkPhone number, splits it a more human readable format XX-XXX-XXXX.
+    .PARAMETER Mobile
+    Takes the Mobile number, splits it a more human readable format XXX-XXX-XXXX.
     .EXAMPLE
     New-SwarmHVVM
     #>
@@ -58,7 +89,7 @@ function New-PFOUser {
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName,
                     Position = 2,
-                    HelpMessage = 'Title is mandatory'
+                    HelpMessage = 'Department is a mandatory parameter'
                     )]
         [string]$Department,
 
@@ -93,6 +124,7 @@ function New-PFOUser {
                     HelpMessage = 'Please use tab complete to select either Permanent or Contractor'
                     )]
         [ArgumentCompleter({'Permanent', 'Contractor'})]
+        [ValidateSet("Permanent", "Contractor")]
         [string]$EmploymentType = "Permanent",
 
         [Parameter(
@@ -101,6 +133,7 @@ function New-PFOUser {
                     HelpMessage = 'Please use tab complete to select either "New Zealand" or Australia'
                     )]
         [ArgumentCompleter({'"New Zealand"', "Australia"})]
+        [ValidateSet("New Zealand","Australia")]
         [string]$Country = "New Zealand",
 
         [Parameter(
