@@ -18,8 +18,9 @@ function New-PFOUser {
 
     Run "Help New-PFOUser -Examples" to see different ways you can use this command. 
     .PARAMETER Name
-    Mandatory
-    Names the VM
+    Takes a name in a "firstname lastname" format, and will put out a GivenName, Surname, FirstName
+    LastName, DisplayName, UserName, EmailAddress, PrimarySMTP, and three proxy addresses that are in the
+    firstname.lastname@xxxxx.com, firstname.lastname@xxxxx.co.nz, username@xxxxx.com, and username@xxxxx.com.
     .PARAMETER Number
     Optional
     Set to 4 GB. Need to change this to a more friendly GB version
