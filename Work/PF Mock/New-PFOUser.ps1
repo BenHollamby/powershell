@@ -2,13 +2,22 @@ function New-PFOUser {
 
     <#
     .SYNOPSIS
-    New-PFOUser will create a new Pxxxx user and formats names into values aligning with the environment
+    New-PFOUser will create a new Pxxxx user with all the domain specific attributes and assigns them.
     .DESCRIPTION
     Creates a new user. You can either pass through a CSV file with the bare minimum of properties, such as Name,
-    Title, and Department. With the bare minimum parameters, it will assume a NZ user on a permanent contract,
-    and create a 12 character random string as the password.
-    You may create 
-    .PARAMETER VMName
+    Title, and Department, Manager and Permissions, or can extend it to have more attributes.
+
+    Alternatively, you can create a new user with parameters, running the command will force you to enter the
+    mandatory parameters.
+
+    If you use the bare minimum parameters, New-PFOUser will assume that the user is based in NZ, and is a
+    permanent employee.
+
+    If you do not specify a password either in a CSV or using the parameter -Password, this command will
+    automatically generate a 12 character string that will be listed at the end.
+
+    Run "Help New-PFOUser -Examples" to see different ways you can use this command. 
+    .PARAMETER Name
     Mandatory
     Names the VM
     .PARAMETER Number
