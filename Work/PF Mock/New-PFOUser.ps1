@@ -29,9 +29,53 @@ function New-PFOUser {
                     Mandatory,
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName,
+                    Position = 0,
                     HelpMessage = 'Please enter a name in a firstname lastname format, with a space,  in quotes like "john doe"'
                     )]
         [string]$Name,
+
+        [Parameter(
+                    Mandatory,
+                    ValueFromPipeline,
+                    ValueFromPipelineByPropertyName,
+                    Position = 1,
+                    HelpMessage = 'Title is mandatory'
+                    )]
+        [string]$Title,
+
+        [Parameter(
+                    Mandatory,
+                    ValueFromPipeline,
+                    ValueFromPipelineByPropertyName,
+                    Position = 2,
+                    HelpMessage = 'Title is mandatory'
+                    )]
+        [string]$Department,
+
+        [Parameter(
+                    Mandatory,
+                    ValueFromPipeline,
+                    ValueFromPipelineByPropertyName,
+                    Position = 3,
+                    HelpMessage = 'Manager is mandatory, please enter in a "firstname lastname" format.'
+                    )]
+        [string]$Manager,
+
+        [Parameter(
+                    Mandatory,
+                    ValueFromPipeline,
+                    ValueFromPipelineByPropertyName,
+                    Position = 4,
+                    HelpMessage = 'Please enter user to base permissions on in a "firstname lastname" format'
+                    )]
+        [string]$Permissions,
+
+        [Parameter(
+                    ValueFromPipeline,
+                    ValueFromPipelineByPropertyName,
+                    Position = 5
+                    )]
+        [string]$Password,
 
         [Parameter(
                     ValueFromPipeline,
@@ -50,34 +94,10 @@ function New-PFOUser {
         [string]$Country = "New Zealand",
 
         [Parameter(
-                    Mandatory,
-                    ValueFromPipeline,
-                    ValueFromPipelineByPropertyName,
-                    HelpMessage = 'Title is mandatory'
-                    )]
-        [string]$Title,
-
-        [Parameter(
-                    Mandatory,
-                    ValueFromPipeline,
-                    ValueFromPipelineByPropertyName,
-                    HelpMessage = 'Title is mandatory'
-                    )]
-        [string]$Department,
-
-        [Parameter(
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
         [string]$Office,
-
-        [Parameter(
-                    Mandatory,
-                    ValueFromPipeline,
-                    ValueFromPipelineByPropertyName,
-                    HelpMessage = 'Manager is mandatory, please enter in a first name space last name format'
-                    )]
-        [string]$Manager,
 
         [Parameter(
                     ValueFromPipeline,
@@ -89,21 +109,8 @@ function New-PFOUser {
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
-        [string]$Mobile,
-
-        [Parameter(
-                    Mandatory,
-                    ValueFromPipeline,
-                    ValueFromPipelineByPropertyName
-                    )]
-        [string]$Permissions,
-
-        [Parameter(
-                    ValueFromPipeline,
-                    ValueFromPipelineByPropertyName
-                    )]
-        [string]$Password
-
+        [string]$Mobile
+   
     )
 
     BEGIN {
@@ -609,6 +616,7 @@ function New-PFOUser {
 
             Try {
 
+                Write-Verbose "Adding proxy addresses to $NewUser"
                 Set-ADUser -Identity $NewUser.DistinguishedName -add @{ProxyAddresses = "SMTP:$PrimarySMTP,smtp:$ProxyAddress1,smtp:$ProxyAddress2,smtp:$ProxyAddress3" -split ","} -ErrorAction Stop  #Sets Proxy addresses                                           
 
             } Catch {
