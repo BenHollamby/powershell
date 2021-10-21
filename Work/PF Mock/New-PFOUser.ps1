@@ -39,8 +39,9 @@ function New-PFOUser {
     Takes a name in a "firstname lastname" format, and will check active directory, and if the user
     exists, will set the manager of the new user.
     .PARAMETER Permissions
-    Takes a name in a "firstname lastname" format, and will check active directory, and if the user
-    exists, will assign all groups that user is a member of and assign them to your new user.
+    Based on "copy user" or base permissions on a user. Takes a name in a "firstname lastname" format,
+    and will check active directory, and if the user exists, will assign all groups that user 
+    is a member of and assign them to your new user.
     .PARAMETER Password
     Completely optional. If not used, a 12 character random string will be generated and supplied
     with the new user details.
@@ -59,7 +60,60 @@ function New-PFOUser {
     .PARAMETER Mobile
     Takes the Mobile number, splits it a more human readable format XXX-XXX-XXXX.
     .EXAMPLE
-    New-SwarmHVVM
+    New-PFOUser -Name "iskaral pust" -Title priest -Department clergy -Manager "drone one" -Permissions "drone two" -EmploymentType Permanent -Country 'New Zealand' -Office rotorua -WorkPhone 078885666 -Mobile 0272587116 -Password Pa$$w0rd!
+    Description
+    An example of using all the parameters. Capitals are not needed. 
+    Tab complete on EmploymentType and Country. 
+    Output is Name, Email, Username and Password.
+    Name         Email                  Username Password
+    ----         -----                  -------- --------
+    Iskaral Pust Iskaral.Pust@Swarm.com pusti    PaSSw0rd!
+    .EXAMPLE
+    New-PFOUser -Name "iskaral pust" -Title priest -Department clergy -Manager "drone one" -Permissions "drone two"
+    Description
+    This example uses only the mandatory parameters. As stated in help, if you do not use the 
+    EmploymentType parameter it will assume a default of Permanent. If you do not use the Country parameter it
+    will assume a default of New Zealand. And if you do not use the Password parameter, it will automatically
+    generate a random 12 character string.
+    Name         Email                  Username Password    
+    ----         -----                  -------- --------    
+    Iskaral Pust Iskaral.Pust@Swarm.com pusti    4$@e^E&vG*~b
+    .EXAMPLE
+    New-PFOUser "iskaral pust" priest clergy "drone one" "drone two"
+    Description
+    For those that become too familiar with this particular user creation method. The mandatory
+    parameters are positional allowing you to forgo typing in the parameters. They must be in order
+    of Name, Title, Department, Manager, and Permissions
+    Name         Email                  Username Password    
+    ----         -----                  -------- --------    
+    Iskaral Pust Iskaral.Pust@Swarm.com pusti    vq+I7nq&^7T#
+    .EXAMPLE
+    Import-Csv C:\Temp\pfotest.csv | New-PFOUser
+    Description
+    You have the option to pipe in users from a CSV. So long as that CSV's headers match the mandatory
+    parameters. You can also add in the optional parameters.
+    This will create as many users as needed. In the output below, you can see that some users have
+    been flagged as contracters. Hidden from the output, users were based in both countries and have
+    been created in their respective Organisational Units.
+    Name         Email                  Username Password    
+    ----         -----                  -------- --------    
+    Kallor One   Kallor.One@Swarm.com   oneka    tJg=EpMqksaV
+    Kallor Two   Kallor.Two@Swarm.com   two_ka   tJg=EpMqksaV
+    Kallor Three Kallor.Three@Swarm.com thre_k   tJg=EpMqksaV
+    Kallor Four  Kallor.Four@Swarm.com  fourk    tJg=EpMqksaV
+    Crayon Ask   Crayon.Ask@Swarm.com   askcr    tJg=EpMqksaV
+    .EXAMPLE
+    Import-Csv C:\Temp\pfotest.csv | New-PFOUser -Password SuperSecurePassword01!
+    Description
+    If you have a CSV and want to set a particular password you can also use the command like 
+    the above example.
+    Name         Email                  Username Password              
+    ----         -----                  -------- --------              
+    Kallor One   Kallor.One@Swarm.com   oneka    SuperSecurePassword01!
+    Kallor Two   Kallor.Two@Swarm.com   two_ka   SuperSecurePassword01!
+    Kallor Three Kallor.Three@Swarm.com thre_k   SuperSecurePassword01!
+    Kallor Four  Kallor.Four@Swarm.com  fourk    SuperSecurePassword01!
+    Crayon Ask   Crayon.Ask@Swarm.com   askcr    SuperSecurePassword01!
     #>
 
     [cmdletbinding()]
