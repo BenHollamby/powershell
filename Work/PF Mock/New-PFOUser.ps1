@@ -72,8 +72,10 @@ function New-PFOUser {
         [string]$Office,
 
         [Parameter(
+                    Mandatory,
                     ValueFromPipeline,
-                    ValueFromPipelineByPropertyName
+                    ValueFromPipelineByPropertyName,
+                    HelpMessage = 'Manager is mandatory, please enter in a first name space last name format'
                     )]
         [string]$Manager,
 
@@ -90,6 +92,7 @@ function New-PFOUser {
         [string]$Mobile,
 
         [Parameter(
+                    Mandatory,
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName
                     )]
@@ -162,6 +165,12 @@ function New-PFOUser {
 
             Write-Verbose "Setting format and variables for $i"
 
+            if (-not($EmploymentType)) {                                                  #If Employment variable not used 
+
+                $EmploymentType = 'Permanent'                                             #Set as Permanent employee
+
+            }
+
             if ($EmploymentType -eq 'Permanent') {
 
                 Write-Verbose "$i has been flagged as a permanent user"
@@ -207,20 +216,52 @@ function New-PFOUser {
                 $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
                 $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
                 $ProxyAddress3        = "$FirstName.$LastName@swarm.co.nz"                #proxy address first name last name .co.nz
-                $WPhone1              = $Workphone.substring(0,2)                         #Split area code
-                $WPhone2              = $Workphone.substring(2,3)                         #First three digits after area code  
-                $WPhone3              = $Workphone.substring(5)                           #Remaining digits  
-                $WorkPhone            = "$WPhone1 $WPhone2 $WPhone3"                      #Variable in a more human readable form
-                $MPhone1              = $Mobile.Substring(0,3)                            #First three digits in mobile
-                $Mobile2              = $Mobile.Substring(3,3)                            #Second three digits in mobile
-                $Mobile3              = $Mobile.Substring(6)                              #Remaining digits
-                $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
                 $Webpage              = "www.swarm.com"                                   #Variable for web page
+
+                #############################################################################
+                ##################### Start of WorkPhone Block ##############################
+                #############################################################################
+
+                if ($WorkPhone) {
+
+                    $WPhone1              = $Workphone.substring(0,2)                         #Split area code
+                    $WPhone2              = $Workphone.substring(2,3)                         #First three digits after area code  
+                    $WPhone3              = $Workphone.substring(5)                           #Remaining digits  
+                    $WorkPhone            = "$WPhone1 $WPhone2 $WPhone3"                      #Variable in a more human readable form
+
+                }
+
+                #############################################################################
+                ##################### End of WorkPhone Block ################################
+                #############################################################################
+
+                #############################################################################
+                ##################### Start of Mobile Block #################################
+                #############################################################################
+
+                if ($Mobile) {
+
+                    $MPhone1              = $Mobile.Substring(0,3)                            #First three digits in mobile
+                    $Mobile2              = $Mobile.Substring(3,3)                            #Second three digits in mobile
+                    $Mobile3              = $Mobile.Substring(6)                              #Remaining digits
+                    $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
+
+                }
+
+                #############################################################################
+                ###################### End of Mobile Block ##################################
+                #############################################################################
 
                 #############################################################################
                 ####################### Start of Country block ##############################
                 #############################################################################
 
+                if (-not($Country)) {
+
+                    $Country = "New Zealand"
+
+                }
+                
                 if ($Country -eq "New Zealand") {
 
                     Write-Verbose "Country flagged as New Zealand"
@@ -345,16 +386,42 @@ function New-PFOUser {
                 $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
                 $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
                 $ProxyAddress3        = "$FirstName.$LastName@swarm.co.nz"                #proxy address first name last name .co.nz
-                $WPhone1              = $Workphone.substring(0,2)                         #Split area code
-                $WPhone2              = $Workphone.substring(2,3)                         #First three digits after area code  
-                $WPhone3              = $Workphone.substring(5)                           #Remaining digits  
-                $WorkPhone            = "$WPhone1 $WPhone2 $WPhone3"                      #Variable in a more human readable form
-                $MPhone1              = $Mobile.Substring(0,3)                            #First three digits in mobile
-                $Mobile2              = $Mobile.Substring(3,3)                            #Second three digits in mobile
-                $Mobile3              = $Mobile.Substring(6)                              #Remaining digits
-                $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
                 $Webpage              = "www.swarm.com"                                   #Variable for web page
                 
+                #############################################################################
+                ##################### Start of WorkPhone Block ##############################
+                #############################################################################
+
+                if ($WorkPhone) {
+
+                    $WPhone1              = $Workphone.substring(0,2)                         #Split area code
+                    $WPhone2              = $Workphone.substring(2,3)                         #First three digits after area code  
+                    $WPhone3              = $Workphone.substring(5)                           #Remaining digits  
+                    $WorkPhone            = "$WPhone1 $WPhone2 $WPhone3"                      #Variable in a more human readable form
+
+                }
+
+                #############################################################################
+                ##################### End of WorkPhone Block ################################
+                #############################################################################
+
+                #############################################################################
+                ##################### Start of Mobile Block #################################
+                #############################################################################
+
+                if ($Mobile) {
+
+                    $MPhone1              = $Mobile.Substring(0,3)                            #First three digits in mobile
+                    $Mobile2              = $Mobile.Substring(3,3)                            #Second three digits in mobile
+                    $Mobile3              = $Mobile.Substring(6)                              #Remaining digits
+                    $Mobile               = "$MPhone1 $Mobile2 $Mobile3"                      #Mobile in a more readable format
+
+                }
+
+                #############################################################################
+                ###################### End of Mobile Block ##################################
+                #############################################################################
+
                 #############################################################################
                 ####################### Start of Country block ##############################
                 #############################################################################
