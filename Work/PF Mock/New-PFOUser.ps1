@@ -736,8 +736,8 @@ function New-PFOUser {
 
             [PSCustomObject] @{                                              #Creates a custom Powershell object into array for outputting new user information like username password etc
 
-                Name = $NewUser.Name                                         #Name of user
-                Email = (Get-ADUser $NewUser -Properties *).EmailAddress     #Email address of user
+                Name     = $NewUser.Name                                         #Name of user
+                Email    = (Get-ADUser $NewUser -Properties *).EmailAddress     #Email address of user
                 Username = $NewUser.SamAccountName                           #Username 
                 Password = $PasswordIs                                       #Password
 
