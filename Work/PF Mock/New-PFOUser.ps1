@@ -265,7 +265,15 @@ function New-PFOUser {
 
         Write-Verbose "Starting foreach loop for Name parameter"
 
-        foreach ($i in $Name) {
+        foreach ($i in $Name) {                                                           #for each name in name
+
+            Write-Verbose "Checking if $i exists in domain"
+            if (Get-ADUser -Filter * | ? {$_.Name -eq "$i"}) {                            #if user exists
+
+                Write-Warning "$i alreadys exists or a user with the same name exists"    #Write warning that user exists or a user with the same name exists
+                continue                                                                  #skip this item
+
+            }
 
             Write-Verbose "Setting format and variables for $i"
 
@@ -726,22 +734,16 @@ function New-PFOUser {
             ################# END OF CONFIGURE PROXY ADDRESSES ##########################
             #############################################################################
 
-            $UserObjects = @()
+            [PSCustomObject] @{                                              #Creates a custom Powershell object into array for outputting new user information like username password etc
 
-            $UserObjects += [PSCustomObject] @{                                          #Creates a custom Powershell object into array for outputting new user information like username password etc
+                Name = $NewUser.Name                                         #Name of user
+                Email = (Get-ADUser $NewUser -Properties *).EmailAddress     #Email address of user
+                Username = $NewUser.SamAccountName                           #Username 
+                Password = $PasswordIs                                       #Password
 
-                            Name = $NewUser.Name                                         #Name of user
-                            Email = (Get-ADUser $NewUser -Properties *).EmailAddress     #Email address of user
-                            Username = $NewUser.SamAccountName                           #Username 
-                            Password = $PasswordIs                                       #Password
-
-                           }
+            }
 
         } #end of foreach $i in $name block
-
-        
-
-        $UserObjects | Select-Object Name, Email, Username, Password                                                                    #Outputs Name, Email Address, UserName and Password
         
     } #end of PROCESS block
 
