@@ -268,7 +268,7 @@ function New-PFOUser {
         foreach ($i in $Name) {                                                           #for each name in name
 
             Write-Verbose "Checking if $i exists in domain"
-            if (Get-ADUser -Filter * | ? {$_.Name -eq "$i"}) {                            #if user exists
+            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$i"}) {                            #if user exists
 
                 Write-Warning "$i alreadys exists or a user with the same name exists"    #Write warning that user exists or a user with the same name exists
                 continue                                                                  #skip this item
