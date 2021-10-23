@@ -408,17 +408,27 @@ function New-PFOUser {
 
                 Write-Verbose " Checking Manager exists"
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                          #tests if manager exists with that name
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                          
 
-                    Write-Verbose "Assigning $Manager to variable"
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #Set Manager to ManagerIs variable if true
+                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {
+        
+                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"}
+
+                    }
+        
+                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {
+        
+                        Write-Verbose "Assigning $Manager to variable"
+                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}  
+
+                    }       
 
                 }
 
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                #If Manager does not exist 
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {               
 
-                    Write-Warning "Unable to find $Manager in directory, please set manually after creation" #write warning
-                    $ManagerIs = $null                                                                       #Set ManagerIs to null
+                    Write-Warning "Unable to find $Manager in directory, please set manually after creation" 
+                    continue                                                                       
 
                 }
 
@@ -430,20 +440,28 @@ function New-PFOUser {
                 ##################### Start of Permissions block ############################
                 #############################################################################
 
-                Write-Verbose "Checking $Permissions exists"
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {                       #If user exists in directory
 
-                    $GroupMemberShips = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}      #Get User and assign to variable
-                    $Groups = (Get-ADUser $GroupMemberShips -Properties MemberOf).MemberOf                    #Assign all groups to a variable    
-
+                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {
+                        
+                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof  
+                
+                    }
+                        
+                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {
+                        
+                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof
+                
+                    }                         
+                
                 }
-
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {             #If user does not exist in directory
-
-                    Write-Warning "$Permissions does not exist in the directory, please set groups manually"
-                    $Groups = $null                                                                           #Sets Groups variable to null
-
+                
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {          
+                
+                    Write-Warning "$Permissions does not exist in the directory, skipping user"
+                    continue
+                                                                                              
                 }
 
                 #############################################################################
