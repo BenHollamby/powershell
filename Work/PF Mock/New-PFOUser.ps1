@@ -268,7 +268,7 @@ function New-PFOUser {
         foreach ($i in $Name) {                                                           #for each name in name
 
             Write-Verbose "Checking if $i exists in domain"
-            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$i"}) {                            #if user exists
+            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$i"}) {                 #if user exists
 
                 Write-Warning "$i alreadys exists or a user with the same name exists"    #Write warning that user exists or a user with the same name exists
                 continue                                                                  #skip this item
@@ -589,18 +589,27 @@ function New-PFOUser {
 
                 Write-Verbose " Checking Manager exists"
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                          #If manager exists in directory
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                          
 
-                    Write-Verbose "Assigning $Manager to variable"
+                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {
+        
+                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"}
 
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                #If Manager exists, assigned to ManagerIs variable
+                    }
+        
+                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {
+        
+                        Write-Verbose "Assigning $Manager to variable"
+                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}  
+
+                    }       
 
                 }
 
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                #If Manager does not exist
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {               
 
-                    Write-Warning "Unable to find $Manager in directory, please set manually after creation" #write warning
-                    $ManagerIs = $null                                                                       #Set ManagerIs to null
+                    Write-Warning "Unable to find $Manager in directory, please set manually after creation" 
+                    continue                                                                       
 
                 }
 
@@ -612,20 +621,28 @@ function New-PFOUser {
                 ##################### Start of Permissions block ############################
                 #############################################################################
 
-                Write-Verbose "Checking $Permissions exists"
-
                 if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {
 
-                    $GroupMemberShips = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}
-                    $Groups = (Get-ADUser $GroupMemberShips -Properties MemberOf).MemberOf
 
+                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {
+                        
+                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof  
+                
+                    }
+                        
+                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {
+                        
+                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof
+                
+                    }                         
+                
                 }
-
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {
-
-                    Write-Warning "$Permissions does not exist in the directory, please set groups manually"
-                    $Groups = $null
-
+                
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {          
+                
+                    Write-Warning "$Permissions does not exist in the directory, skipping user"
+                    continue
+                                                                                              
                 }
 
                 #############################################################################
