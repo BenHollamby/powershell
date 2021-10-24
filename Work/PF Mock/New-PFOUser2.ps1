@@ -69,6 +69,24 @@ function New-PFOUser {
     to create a user with the same name.
 
     .EXAMPLE
+    New-PFOUser
+    Description
+    Just running New-PFOUser will then prompt you for the Name, then the title, then the 
+    department, then a manager, then permissions. Will assume all defaults as stated in 
+    description above.
+    New-PFOUser
+    cmdlet New-PFOUser at command pipeline position 1
+    Supply values for the following parameters:
+    (Type !? for Help.)
+    Name: caladan brood
+    Title: high fist
+    Department: forest management
+    Manager: drone one
+    Permissions: drone two
+    Name          Email                   Username Password    
+    ----          -----                   -------- --------    
+    Caladan Brood Caladan.Brood@Swarm.com brooc    <password>
+    .EXAMPLE
     New-PFOUser -Name "iskaral pust" -Title priest -Department clergy -Manager "drone one" -Permissions "drone two" -EmploymentType Permanent -Country 'New Zealand' -Office rotorua -WorkPhone 078885666 -Mobile 0272587116 -Password <password>
     Description
     An example of using all the parameters. Capitals are not needed. 
