@@ -1175,6 +1175,22 @@ function New-PFOUser {
 
     END {
 
+        Try {
+
+            Write-Verbose "Invoking AD Sync on <server>"
+            Invoke-Command -ComputerName "<servername>" -ScriptBlock {        #Invokes ADSync command on remote server
+    
+                Import-Module ADSync
+                Start-ADSyncSyncCycle -PolicyType Delta
+    
+            } -ErrorAction Stop
+    
+        } Catch {
+    
+            Write-Warning "Unable to sync, please wait up to 30 minutes for the next automatic sync, or run manually"
+
+        }
+
     }
 
 }
