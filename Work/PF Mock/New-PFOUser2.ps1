@@ -292,25 +292,25 @@ function New-PFOUser {
                         $Characters = 33..126
                         $Random = Get-Random $Characters
                         $string = [char]$Random
-                        $RandomPassword += $string                                                      #While loop creates 12 character password 
+                        $RandomPassword += $string                                           #While loop creates 12 character password 
     
                     } #end of foreach block
     
                 } #end of while block
 
-                $PasswordIs = $RandomPassword                                                           #Assigns randomly generated password to PasswordIs Variable 
+                $PasswordIs = $RandomPassword                                                #Assigns randomly generated password to PasswordIs Variable 
 
             }
 
-             elseif ($Password) {                                                                       #if password parameter is used
+             elseif ($Password) {                                                            #if password parameter is used
 
                 Write-Verbose "Password parameter used, assigning to Password Is variable"
 
-                 $PasswordIs = $Password                                                                #Assigns password to PasswordIs Variable
+                 $PasswordIs = $Password                                                     #Assigns password to PasswordIs Variable
 
              }
 
-             $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)                 #Converts password to secure string
+             $PasswordWillBe = (ConvertTo-SecureString -AsPlainText $PasswordIs -Force)      #Converts password to secure string
 
             #############################################################################
             ###################### End of random password block #########################
@@ -349,7 +349,7 @@ function New-PFOUser {
                     $Department           = (Get-Culture).TextInfo.ToTitleCase($Department)   #Sets the department variable to titlecase
                     $Office               = (Get-Culture).TextInfo.ToTitleCase($Office)       #Sets the office variable to titlecase
                     $Company              = (Get-Culture).TextInfo.ToTitleCase("s company")   #Sets a variable for company name
-                    $Description          = $Title                                          #Sets a variable for description which is currently the same as company
+                    $Description          = $Title                                            #Sets a variable for description which is currently the same as company
                     
                     if ($LastName.Length -eq 3) {                                             #if lastname is less than 3 do
 
@@ -374,26 +374,26 @@ function New-PFOUser {
                         
                     } #end of catch all block
 
-                    $UserNameMod          = "$LastNameMod$FirstNameMod$SuffixValue"                       #joins last four characters of the last name and the first character of the first name in a variable
+                    $UserNameMod          = "$LastNameMod$FirstNameMod$SuffixValue"           #joins last four characters of the last name and the first character of the first name in a variable
                     $UserName             = (Get-Culture).TextInfo.ToLower($UserNameMod)      #sets the username variable to lowercase
-                    $EmailAddress         = "$FirstName.$LastName$SuffixValue@Swarm.com"                  #creates the email address variable
+                    $EmailAddress         = "$FirstName.$LastName$SuffixValue@Swarm.com"      #creates the email address variable
                     $PrimarySMTP          = $EmailAddress                                     #Primary SMTP variable
                     $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
                     $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
-                    $ProxyAddress3        = "$FirstName.$LastName$SuffixValue@swarm.co.nz"                #proxy address first name last name .co.nz
+                    $ProxyAddress3        = "$FirstName.$LastName$SuffixValue@swarm.co.nz"    #proxy address first name last name .co.nz
                     $Webpage              = "www.swarm.com"                                   #Variable for web page
 
                     #############################################################################
                     ####################### Start of Country block ##############################
                     #############################################################################
 
-                    if (-not($Country)) {
+                    if (-not($Country)) {                                                     #if Country parameter not used
 
-                        $Country = "New Zealand"
+                        $Country = "New Zealand"                                              #Country set to NZ  
 
                     }
                     
-                    if ($Country -eq "New Zealand") {
+                    if ($Country -eq "New Zealand") {                                         #if country set to New Zealand
 
                         Write-Verbose "Country flagged as New Zealand"
 
@@ -405,7 +405,7 @@ function New-PFOUser {
 
                     } #end of Country is NZ block
 
-                    elseif ($Country -eq "Australia") {
+                    elseif ($Country -eq "Australia") {                                       #if country set to Australia
 
                         Write-Verbose "Country flagged as Australia"
 
@@ -423,7 +423,7 @@ function New-PFOUser {
 
                 } #end of if employment type is permanent block
 
-                elseif ($EmploymentType -eq 'Contractor') {
+                elseif ($EmploymentType -eq 'Contractor') {                                   #if EmploymentType set as Contractor
 
                     Write-Verbose "$i has been flagged as a contractor"
 
@@ -431,16 +431,16 @@ function New-PFOUser {
                     $Surname              = (Get-Culture).TextInfo.ToTitleCase($i.Split()[1]) #Sets variable of last name to titlecase.
                     $FirstName            = (Get-Culture).TextInfo.ToTitleCase($i.Split()[0]) #Sets variable of first name to titlecase. Doubled up so the New-ADUser parameters are clearer.
                     $LastName             = (Get-Culture).TextInfo.ToTitleCase($i.Split()[1]) #Sets variable of last name to titlecase. Doubled up so the New-ADUser parameters are clearer.
-                    $InitialOne           = $FirstName[0]
-                    $InitialTwo           = $LastName[0]
-                    $Initials             = "$InitialOne$InitialTwo"
-                    $DisplayNamePreSuffix = (Get-Culture).TextInfo.ToTitleCase($i)            #Sets variable of displayt name to titlecase.
-                    $DisplayName          = "$DisplayNamePreSuffix$SuffixValue"
+                    $InitialOne           = $FirstName[0]                                     #first of initial of firstname
+                    $InitialTwo           = $LastName[0]                                      #first initial of lastname
+                    $Initials             = "$InitialOne$InitialTwo"                          #combines initialone and initialtwo variables
+                    $DisplayNamePreSuffix = (Get-Culture).TextInfo.ToTitleCase($i)            #Sets variable of display name to titlecase.
+                    $DisplayName          = "$DisplayNamePreSuffix$SuffixValue"               #Sets Displayname with suffix to variable  
                     $Title                = (Get-Culture).TextInfo.ToTitleCase($Title)        #Sets the title variable to titlecase
                     $Department           = (Get-Culture).TextInfo.ToTitleCase($Department)   #Sets the department variable to titlecase
                     $Office               = (Get-Culture).TextInfo.ToTitleCase($Office)       #Sets the office variable to titlecase
                     $Company              = (Get-Culture).TextInfo.ToTitleCase("s company")   #Sets a variable for company name
-                    $Description          = $Title                                          #Sets a variable for description which is currently the same as company
+                    $Description          = $Title                                            #Sets a variable for description which is currently the same as company
                     
                     if ($LastName.Length -eq 3) {                                             #if lastname is less than 3 do
 
@@ -465,31 +465,31 @@ function New-PFOUser {
                         
                     } #end of catch all block
 
-                    $ContractorMod        = "_"                                               #underscore variable for contractor
-                    $UserNameMod          = "$LastNameMod$ContractorMod$FirstNameMod$SuffixValue"         #joins last four characters of the last name and the first character of the first name in a variable
-                    $UserName             = (Get-Culture).TextInfo.ToLower($UserNameMod)      #sets the username variable to lowercase
-                    $EmailAddress         = "$FirstName.$LastName$SuffixValue@Swarm.com"                  #creates the email address variable
-                    $PrimarySMTP          = $EmailAddress                                     #Primary SMTP variable
-                    $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
-                    $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
-                    $ProxyAddress3        = "$FirstName.$LastName$SuffixValue@swarm.co.nz"                #proxy address first name last name .co.nz
-                    $Webpage              = "www.swarm.com"                                   #Variable for web page
+                    $ContractorMod        = "_"                                                   #underscore variable for contractor
+                    $UserNameMod          = "$LastNameMod$ContractorMod$FirstNameMod$SuffixValue" #joins last four characters of the last name and the first character of the first name in a variable
+                    $UserName             = (Get-Culture).TextInfo.ToLower($UserNameMod)          #sets the username variable to lowercase
+                    $EmailAddress         = "$FirstName.$LastName$SuffixValue@Swarm.com"          #creates the email address variable
+                    $PrimarySMTP          = $EmailAddress                                         #Primary SMTP variable
+                    $ProxyAddress1        = "$UserName@swarm.com"                                 #Proxy address username .com             
+                    $ProxyAddress2        = "$UserName@swarm.co.nz"                               #proxy address username .co.nz
+                    $ProxyAddress3        = "$FirstName.$LastName$SuffixValue@swarm.co.nz"        #proxy address first name last name .co.nz
+                    $Webpage              = "www.swarm.com"                                       #Variable for web page
 
                     #############################################################################
                     ####################### Start of Country block ##############################
                     #############################################################################
 
-                    if (-not($Country)) {
+                    if (-not($Country)) {                                                     #if Country not set
 
-                        $Country = "New Zealand"
+                        $Country = "New Zealand"                                              #Country set to NZ  
 
                     }
                     
-                    if ($Country -eq "New Zealand") {
+                    if ($Country -eq "New Zealand") {                                         #if Country set to NZ              
 
                         Write-Verbose "Country flagged as New Zealand"
 
-                        $OU                = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"       #Sets OU to x 
+                        $OU                = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"  #Sets OU to x 
                         $C                 = "NZ"                                             #Sets C to NZ 
                         $CO                = "New Zealand"                                    #Sets CO to New Zealand
                         $CCode             = "554"                                            #Sets country code to NZ
@@ -497,11 +497,11 @@ function New-PFOUser {
 
                     } #end of Country is NZ block
 
-                    elseif ($Country -eq "Australia") {
+                    elseif ($Country -eq "Australia") {                                       #if Country set to Australia
 
                         Write-Verbose "Country flagged as Australia"
 
-                        $OU                = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"        #Sets OU to x 
+                        $OU                = "OU=Swarm Contractors,OU=Swarm,DC=swarm,DC=com"  #Sets OU to x 
                         $C                 = "AU"                                             #Sets C to AU 
                         $CO                = "Australia"                                      #Sets Country to Australia
                         $CCode             = "036"                                            #Sets country code to Australia
@@ -512,13 +512,8 @@ function New-PFOUser {
                     #############################################################################
                     ######################## End of Country block ###############################
                     #############################################################################
-                    
-                
-                #} #end of if employment type is contractor block
 
-                #} #end of foreach $i in $Name
-
-                } #end of else block
+                } #end of elseif block
 
             #############################################################################
             ##################### Start of WorkPhone Block ##############################
@@ -560,27 +555,27 @@ function New-PFOUser {
 
             Write-Verbose " Checking Manager exists"
 
-            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                          
+            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                        #if manager exists in AD                                                 
 
-                if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {
+                if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {                                      #if adobject equal to or greater than two     
     
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"}
+                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"} #Assigns manager to variable where SamAccountName does not have admin in it
 
                 }
     
-                elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {
+                elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {                                 #else if manager equals 1 AD object
     
                     Write-Verbose "Assigning $Manager to variable"
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}  
+                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                                          #assigns manager to manager is variable    
 
                 }       
 
             }
 
-            elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {               
+            elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                                              #else if user not found in directory
 
-                Write-Warning "Unable to find $Manager in directory, please set manually after creation" 
-                continue                                                                       
+                Write-Warning "Unable to find $Manager in directory, please set manually after creation"                               #warning prompt
+                continue                                                                                                               #skip this user and move onto next user
 
             }
 
@@ -592,27 +587,27 @@ function New-PFOUser {
             ##################### Start of Permissions block ############################
             #############################################################################
 
-            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {
+            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {                                                                                     #if permissions exists in AD
 
 
-                if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {
+                if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {                                                                   #if number of objects is greater than or equal to two
                     
-                    $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof  
+                    $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof #grabs all groups of user where samaccountname does not contain admin and assigns to variable 
             
                 }
                     
-                elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {
+                elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {                                                              #else if user object equals 1
                     
-                    $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof
+                    $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof                                          #assigns all groups to group variable        
             
                 }                         
             
             }
             
-            elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {          
+            elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {                                                                           #if user not found in directory
             
-                Write-Warning "$Permissions does not exist in the directory, skipping user"
-                continue
+                Write-Warning "$Permissions does not exist in the directory, skipping user"                                                                             #write warning on screen        
+                continue                                                                                                                                                #move to next user loop    
                                                                                             
             }
 
@@ -670,7 +665,7 @@ function New-PFOUser {
             ######################### PERMISSIONS BLOCK #################################
             #############################################################################
 
-            $NewUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}          #Assign newly created user to NewUser Variable 
+            $NewUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}      #Assign newly created user to NewUser Variable 
             
             Write-Verbose "$NewUser assigned to NewUser variable"
 
@@ -809,14 +804,14 @@ function New-PFOUser {
                         
                     } #end of catch all block
 
-                $UserNameMod          = "$LastNameMod$FirstNameMod"                       #joins last four characters of the last name and the first character of the first name in a variable
-                $UserName             = (Get-Culture).TextInfo.ToLower($UserNameMod)      #sets the username variable to lowercase
-                $EmailAddress         = "$FirstName.$LastName@Swarm.com"                  #creates the email address variable
-                $PrimarySMTP          = $EmailAddress                                     #Primary SMTP variable
-                $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
-                $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
-                $ProxyAddress3        = "$FirstName.$LastName@swarm.co.nz"                #proxy address first name last name .co.nz
-                $Webpage              = "www.swarm.com"                                   #Variable for web page
+                $UserNameMod          = "$LastNameMod$FirstNameMod"                           #joins last four characters of the last name and the first character of the first name in a variable
+                $UserName             = (Get-Culture).TextInfo.ToLower($UserNameMod)          #sets the username variable to lowercase
+                $EmailAddress         = "$FirstName.$LastName@Swarm.com"                      #creates the email address variable
+                $PrimarySMTP          = $EmailAddress                                         #Primary SMTP variable
+                $ProxyAddress1        = "$UserName@swarm.com"                                 #Proxy address username .com             
+                $ProxyAddress2        = "$UserName@swarm.co.nz"                               #proxy address username .co.nz
+                $ProxyAddress3        = "$FirstName.$LastName@swarm.co.nz"                    #proxy address first name last name .co.nz
+                $Webpage              = "www.swarm.com"                                       #Variable for web page
 
                 #############################################################################
                 ####################### Start of Country block ##############################
@@ -986,27 +981,27 @@ function New-PFOUser {
 
                 Write-Verbose " Checking Manager exists"
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                          
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                        #if user exists in directory                    
 
-                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {
+                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {                                      #if more than one object returns 
 
-                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"}
+                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"} #set manager to variable where name does not contain admin
 
                     }
 
-                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {
+                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {                                 #if one object returns 
 
                         Write-Verbose "Assigning $Manager to variable"
-                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}  
+                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                                          #assign user to variable 
 
                     }       
 
                 }
 
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {               
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                                              #if user not found in directory 
 
-                    Write-Warning "Unable to find $Manager in directory, please set manually after creation" 
-                    continue                                                                       
+                    Write-Warning "Unable to find $Manager in directory, please set manually after creation"                               #write warning to screen 
+                    continue                                                                                                               #skip current user loop and move to next user 
 
                 }
 
@@ -1018,27 +1013,27 @@ function New-PFOUser {
                 ##################### Start of Permissions block ############################
                 #############################################################################
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {
+                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {                                                                                      #if user exists in directory   
 
 
-                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {
+                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {                                                                    #if more than one user is returned   
                         
-                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof  
+                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof  #get user where name not equal admin and assign all their groups to variable
                 
                     }
                         
-                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {
+                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {                                                               #if one user returned   
                         
-                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof
+                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof                                           #assign all groups to variable from user
                 
                     }                         
                 
                 }
                         
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {          
+                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {                                                                            #if user not found   
                 
-                    Write-Warning "$Permissions does not exist in the directory, skipping user"
-                    continue
+                    Write-Warning "$Permissions does not exist in the directory, skipping user"                                                                              #write warning on screen   
+                    continue                                                                                                                                                 #skip this user loop and move to next user   
                                                                                                 
                 }
 
@@ -1079,7 +1074,7 @@ function New-PFOUser {
                 Try {
 
                     Write-Verbose "Attempting to create $DisplayName"
-                    New-ADUser @Arguments                                                            #Create new user with arguments splatt
+                    New-ADUser @Arguments                                                       #Create new user with arguments splatt
 
                 } Catch {
 
@@ -1095,18 +1090,18 @@ function New-PFOUser {
                 ######################### PERMISSIONS BLOCK #################################
                 #############################################################################
 
-                $NewUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}          #Assign newly created user to NewUser Variable 
+                $NewUser = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$DisplayName"}     #Assign newly created user to NewUser Variable 
                 
                 Write-Verbose "$NewUser assigned to NewUser variable"
 
-                foreach ($Group in $Groups) {                                                    #Iterating through each user group
+                foreach ($Group in $Groups) {                                                   #Iterating through each user group
 
                     Write-Verbose "Grabbing $Group"
                     
                     Try {
 
                         Write-Verbose "Assigning $NewUser to $Group Group"
-                        Add-ADGroupMember -Identity $Group -Members $NewUser -ErrorAction Stop   #Assigning group to user
+                        Add-ADGroupMember -Identity $Group -Members $NewUser -ErrorAction Stop  #Assigning group to user
 
                     } Catch {
 
@@ -1128,10 +1123,10 @@ function New-PFOUser {
 
                     Write-Verbose "Setting ADObjects for $NewUser"
                     Set-ADObject -Identity $NewUser.DistinguishedName `
-                        -Replace @{preferredLanguage = "$PreferredLanguage";                        #Sets Preferred Language
-                                                    co = $CO;                                         #Sets Country
-                                            countryCode = $CCode;                                      #Sets Country Code
-                                            wWWHomePage = $Webpage                                     #Sets Webpage
+                        -Replace @{preferredLanguage = "$PreferredLanguage";                    #Sets Preferred Language
+                                                    co = $CO;                                   #Sets Country
+                                            countryCode = $CCode;                               #Sets Country Code
+                                            wWWHomePage = $Webpage                              #Sets Webpage
                                     } -ErrorAction Stop
                                                                                                     
                 } Catch {
@@ -1165,8 +1160,8 @@ function New-PFOUser {
 
                 [PSCustomObject] @{                                              #Creates a custom Powershell object into array for outputting new user information like username password etc
 
-                    Name     = $NewUser.Name                                         #Name of user
-                    Email    = (Get-ADUser $NewUser -Properties *).EmailAddress     #Email address of user
+                    Name     = $NewUser.Name                                     #Name of user
+                    Email    = (Get-ADUser $NewUser -Properties *).EmailAddress  #Email address of user
                     Username = $NewUser.SamAccountName                           #Username 
                     Password = $PasswordIs                                       #Password
 
