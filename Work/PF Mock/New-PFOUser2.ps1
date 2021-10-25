@@ -574,7 +574,7 @@ function New-PFOUser {
 
             elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                                              #else if user not found in directory
 
-                Write-Warning "Unable to find $Manager in directory, please set manually after creation"                               #warning prompt
+                Write-Warning "Unable to find $Manager in directory, skipping user"                                                    #warning prompt
                 continue                                                                                                               #skip this user and move onto next user
 
             }
@@ -1000,7 +1000,7 @@ function New-PFOUser {
 
                 elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                                              #if user not found in directory 
 
-                    Write-Warning "Unable to find $Manager in directory, please set manually after creation"                               #write warning to screen 
+                    Write-Warning "Unable to find $Manager in directory, skipping user"                                                    #write warning to screen 
                     continue                                                                                                               #skip current user loop and move to next user 
 
                 }
