@@ -1,4 +1,4 @@
-function New-PFOUser {
+function New-PFOUser2 {
 
     <#
     .SYNOPSIS
@@ -199,7 +199,7 @@ function New-PFOUser {
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName,
                     Position = 3,
-                    HelpMessage = 'Manager is mandatory, please enter in a "firstname lastname" format.'
+                    HelpMessage = 'Manager is mandatory, please enter username of the manager.'
                     )]
         [string]$Manager,
 
@@ -208,7 +208,7 @@ function New-PFOUser {
                     ValueFromPipeline,
                     ValueFromPipelineByPropertyName,
                     Position = 4,
-                    HelpMessage = 'Please enter user to base permissions on in a "firstname lastname" format'
+                    HelpMessage = 'Please enter username of the user to base permissions on.'
                     )]
         [string]$Permissions,
 
@@ -340,9 +340,6 @@ function New-PFOUser {
                     $Surname              = (Get-Culture).TextInfo.ToTitleCase($i.Split()[1]) #Sets variable of last name to titlecase.
                     $FirstName            = (Get-Culture).TextInfo.ToTitleCase($i.Split()[0]) #Sets variable of first name to titlecase. Doubled up so the New-ADUser parameters are clearer.
                     $LastName             = (Get-Culture).TextInfo.ToTitleCase($i.Split()[1]) #Sets variable of last name to titlecase. Doubled up so the New-ADUser parameters are clearer.
-                    $InitialOne           = $FirstName[0]
-                    $InitialTwo           = $LastName[0]
-                    $Initials             = "$InitialOne$InitialTwo"
                     $DisplayNamePreSuffix = (Get-Culture).TextInfo.ToTitleCase($i)            #Sets variable of displayt name to titlecase.
                     $DisplayName          = "$DisplayNamePreSuffix$SuffixValue"
                     $Title                = (Get-Culture).TextInfo.ToTitleCase($Title)        #Sets the title variable to titlecase
@@ -431,9 +428,6 @@ function New-PFOUser {
                     $Surname              = (Get-Culture).TextInfo.ToTitleCase($i.Split()[1]) #Sets variable of last name to titlecase.
                     $FirstName            = (Get-Culture).TextInfo.ToTitleCase($i.Split()[0]) #Sets variable of first name to titlecase. Doubled up so the New-ADUser parameters are clearer.
                     $LastName             = (Get-Culture).TextInfo.ToTitleCase($i.Split()[1]) #Sets variable of last name to titlecase. Doubled up so the New-ADUser parameters are clearer.
-                    $InitialOne           = $FirstName[0]                                     #first of initial of firstname
-                    $InitialTwo           = $LastName[0]                                      #first initial of lastname
-                    $Initials             = "$InitialOne$InitialTwo"                          #combines initialone and initialtwo variables
                     $DisplayNamePreSuffix = (Get-Culture).TextInfo.ToTitleCase($i)            #Sets variable of display name to titlecase.
                     $DisplayName          = "$DisplayNamePreSuffix$SuffixValue"               #Sets Displayname with suffix to variable  
                     $Title                = (Get-Culture).TextInfo.ToTitleCase($Title)        #Sets the title variable to titlecase
@@ -555,27 +549,15 @@ function New-PFOUser {
 
             Write-Verbose " Checking Manager exists"
 
-            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                        #if manager exists in AD                                                 
+            if (Get-ADUser -Filter * | Where-Object {$_.SamAccountName -eq "$Manager"}) {                                                        #if manager exists in AD                                                 
 
-                if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {                                      #if adobject equal to or greater than two     
-    
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"} #Assigns manager to variable where SamAccountName does not have admin in it
+                Write-Verbose "Assigning $Manager to variable"
+                $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.SamAccountName -eq "$Manager"}
 
-                }
-    
-                elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {                                 #else if manager equals 1 AD object
-    
-                    Write-Verbose "Assigning $Manager to variable"
-                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                                          #assigns manager to manager is variable    
+            } else {
 
-                }       
-
-            }
-
-            elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                                              #else if user not found in directory
-
-                Write-Warning "Unable to find $Manager in directory, skipping user"                                                    #warning prompt
-                continue                                                                                                               #skip this user and move onto next user
+                Write-Warning "Could not find $Manager user to set as manager, please check the username."
+                continue
 
             }
 
@@ -587,28 +569,18 @@ function New-PFOUser {
             ##################### Start of Permissions block ############################
             #############################################################################
 
-            if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {                                                                                     #if permissions exists in AD
+            Write-Verbose " Checking $Permissions exists"
 
+            if (Get-ADUser -Filter * | Where-Object {$_.SamAccountName -eq "$Permissions"}) {                                                        #if manager exists in AD                                                 
 
-                if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {                                                                   #if number of objects is greater than or equal to two
-                    
-                    $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof #grabs all groups of user where samaccountname does not contain admin and assigns to variable 
-            
-                }
-                    
-                elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {                                                              #else if user object equals 1
-                    
-                    $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof                                          #assigns all groups to group variable        
-            
-                }                         
-            
-            }
-            
-            elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {                                                                           #if user not found in directory
-            
-                Write-Warning "$Permissions does not exist in the directory, skipping user"                                                                             #write warning on screen        
-                continue                                                                                                                                                #move to next user loop    
-                                                                                            
+                Write-Verbose "Assigning $Manager to variable"
+                $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof
+
+            } else {
+
+                Write-Warning "Could not find $Permissions user to base permissions on, please check the username."
+                continue
+
             }
 
             #############################################################################
@@ -625,7 +597,6 @@ function New-PFOUser {
                 Name                  = $DisplayName
                 Title                 = $Title
                 Office                = $Office
-                Initials              = $Initials
                 OfficePhone           = $WorkPhone
                 Company               = $Description
                 Description           = $Description
@@ -981,27 +952,15 @@ function New-PFOUser {
 
                 Write-Verbose " Checking Manager exists"
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}) {                                                        #if user exists in directory                    
+                if (Get-ADUser -Filter * | Where-Object {$_.SamAccountName -eq "$Manager"}) {                                                        #if manager exists in AD                                                 
 
-                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -ge 2) {                                      #if more than one object returns 
+                    Write-Verbose "Assigning $Manager to variable"
+                    $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.SamAccountName -eq "$Manager"}
 
-                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager" -and $_.SamAccountName -notlike "admin*"} #set manager to variable where name does not contain admin
+                } else {
 
-                    }
-
-                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"}).count -eq 1)  {                                 #if one object returns 
-
-                        Write-Verbose "Assigning $Manager to variable"
-                        $ManagerIs = Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Manager"}                                          #assign user to variable 
-
-                    }       
-
-                }
-
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$manager"})) {                                              #if user not found in directory 
-
-                    Write-Warning "Unable to find $Manager in directory, skipping user"                                                    #write warning to screen 
-                    continue                                                                                                               #skip current user loop and move to next user 
+                    Write-Warning "Could not find $Manager user to add as manager, please check the username."
+                    continue
 
                 }
 
@@ -1013,28 +972,18 @@ function New-PFOUser {
                 ##################### Start of Permissions block ############################
                 #############################################################################
 
-                if (Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}) {                                                                                      #if user exists in directory   
+                Write-Verbose " Checking $Permissions exists"
 
+                if (Get-ADUser -Filter * | Where-Object {$_.SamAccountName -eq "$Permissions"}) {                                                        #if manager exists in AD                                                 
 
-                    if ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -ge 2) {                                                                    #if more than one user is returned   
-                        
-                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions" -and $_.SamAccountName -notlike "admin*"}).memberof  #get user where name not equal admin and assign all their groups to variable
-                
-                    }
-                        
-                    elseif ((Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"}).count -eq 1)  {                                                               #if one user returned   
-                        
-                        $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof                                           #assign all groups to variable from user
-                
-                    }                         
-                
-                }
-                        
-                elseif (-not(Get-ADUser -Filter * | Where-Object {$_.Name -eq "$Permissions"})) {                                                                            #if user not found   
-                
-                    Write-Warning "$Permissions does not exist in the directory, skipping user"                                                                              #write warning on screen   
-                    continue                                                                                                                                                 #skip this user loop and move to next user   
-                                                                                                
+                    Write-Verbose "Assigning $Manager to variable"
+                    $Groups = (Get-ADUser -Filter * -Properties MemberOf | Where-Object {$_.Name -eq "$Permissions"}).memberof
+
+                } else {
+
+                    Write-Warning "Could not find $Permissions user to base memberships on, please check the username."
+                    continue
+
                 }
 
                 #############################################################################
