@@ -1,10 +1,12 @@
-﻿Describe "Set-ServiceStatus" {
+﻿. .\Pester\1-Set-ServiceStatus.ps1
+
+Describe "Set-ServiceStatus" {
 
     It "starts BITS" {
 
         Stop-Service BITS
         $result = Set-ServiceStatus BITS
-        $result.status | Should Be 'Running'
+        $result.status | Should -Be 'Running'
 
     }
 
@@ -12,7 +14,7 @@
 
         Stop-Service BITS
         $result = Set-ServiceStatus BITS,FAKE
-        $result.status | Should Be 'Running'
+        $result.status | Should -Be 'Running'
 
     }
 
@@ -20,8 +22,8 @@
 
         Stop-Service BITS
         $result = Set-ServiceStatus BITS,TimeBrokerSvc
-        $result | Select -First 1 -ExpandProperty Status | Should Be 'Running'
-        $result | Select -Last 1 -ExpandProperty Status | Should Be 'Running'
+        $result | Select-Object -First 1 -ExpandProperty Status | Should -Be 'Running'
+        $result | Select-Object -Last 1 -ExpandProperty Status | Should -Be 'Running'
 
     }
 
