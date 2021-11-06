@@ -217,7 +217,7 @@ function New-PFOUser2 {
                     ValueFromPipelineByPropertyName,
                     Position = 5
                     )]
-        [string]$Password,
+        [securestring]$Password,
 
         [Parameter(
                     ValueFromPipeline,
