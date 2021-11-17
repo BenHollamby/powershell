@@ -46,6 +46,7 @@ function Format-SwarmNamePermanent {
 
         $UserNameMod          = "$LastNameMod$FirstNameMod"                       #joins last four characters of the last name and the first character of the first name in a variable
         $UserName             = (Get-Culture).TextInfo.ToLower($UserNameMod)      #sets the username variable to lowercase
+        $SamAccountName       = $UserName  
         $EmailAddress         = "$FirstName.$LastName@swarm.com"                  #creates the email address variable
         $PrimarySMTP          = $EmailAddress                                     #Primary SMTP variable
         $UserPrincipalName    = "$FirstName.$LastName@swarm.co.nz"                #proxy address first name last name .co.nz
@@ -69,5 +70,6 @@ function Format-SwarmNamePermanent {
     $ProxyAddress1 
     $ProxyAddress2 
     $ProxyAddress3
-    
+    $SamAccountName
+ 
 }
