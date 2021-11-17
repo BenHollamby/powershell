@@ -1,4 +1,4 @@
-function New-PFOUser2 {
+function New-PFOUser {
 
     <#
     .SYNOPSIS

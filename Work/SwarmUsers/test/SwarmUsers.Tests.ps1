@@ -30,10 +30,10 @@ Describe 'Format-SwarmNamePermanent' {
         $Lower[7] | Should -Be "pusti"
         $Lower[8] | Should -Be "Iskaral.Pust@Swarm.com"
         $Lower[9] | Should -Be "Iskaral.Pust@Swarm.com"
-        $Lower[10] | Should -Be "pusti@swarm.com"
-        $Lower[11] | Should -Be "pusti@swarm.co.nz"
-        $Lower[12] | Should -Be "Iskaral.Pust@swarm.co.nz"
-
+        $Lower[10] | Should -Be "Iskaral.Pust@swarm.co.nz"
+        $Lower[11] | Should -Be "pusti@swarm.com"
+        $Lower[12] | Should -Be "pusti@swarm.co.nz" 
+        $Lower[13] | Should -Be "Iskaral.Pust@swarm.co.nz"
     }
 
     It "Spilts the first name, lowercases the name and title cases" {
@@ -48,9 +48,10 @@ Describe 'Format-SwarmNamePermanent' {
         $Upper[7] | Should -Be "pusti"
         $Upper[8] | Should -Be "Iskaral.Pust@Swarm.com"
         $Upper[9] | Should -Be "Iskaral.Pust@Swarm.com"
-        $Upper[10] | Should -Be "pusti@swarm.com"
-        $Upper[11] | Should -Be "pusti@swarm.co.nz"
-        $Upper[12] | Should -Be "Iskaral.Pust@swarm.co.nz"
+        $Upper[10] | Should -Be "Iskaral.Pust@swarm.co.nz"
+        $Upper[11] | Should -Be "pusti@swarm.com"
+        $Upper[12] | Should -Be "pusti@swarm.co.nz" 
+        $Upper[13] | Should -Be "Iskaral.Pust@swarm.co.nz"
 
     }
 
@@ -66,9 +67,10 @@ Describe 'Format-SwarmNamePermanent' {
         $Pipeline[7] | Should -Be "pusti"
         $Pipeline[8] | Should -Be "Iskaral.Pust@Swarm.com"
         $Pipeline[9] | Should -Be "Iskaral.Pust@Swarm.com"
-        $Pipeline[10] | Should -Be "pusti@swarm.com"
-        $Pipeline[11] | Should -Be "pusti@swarm.co.nz"
-        $Pipeline[12] | Should -Be "Iskaral.Pust@swarm.co.nz"
+        $Pipeline[10] | Should -Be "Iskaral.Pust@swarm.co.nz"
+        $Pipeline[11] | Should -Be "pusti@swarm.com"
+        $Pipeline[12] | Should -Be "pusti@swarm.co.nz" 
+        $Pipeline[13] | Should -Be "Iskaral.Pust@swarm.co.nz"
 
     }
 

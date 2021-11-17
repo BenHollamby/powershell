@@ -44,13 +44,14 @@ function Format-SwarmNamePermanent {
             
         } #end of catch all block
 
-        $UserNameMod          = "$LastNameMod$FirstNameMod$SuffixValue"           #joins last four characters of the last name and the first character of the first name in a variable
+        $UserNameMod          = "$LastNameMod$FirstNameMod"                       #joins last four characters of the last name and the first character of the first name in a variable
         $UserName             = (Get-Culture).TextInfo.ToLower($UserNameMod)      #sets the username variable to lowercase
-        $EmailAddress         = "$FirstName.$LastName$SuffixValue@Swarm.com"      #creates the email address variable
+        $EmailAddress         = "$FirstName.$LastName@swarm.com"                  #creates the email address variable
         $PrimarySMTP          = $EmailAddress                                     #Primary SMTP variable
+        $UserPrincipalName    = "$FirstName.$LastName@swarm.co.nz"                #proxy address first name last name .co.nz
         $ProxyAddress1        = "$UserName@swarm.com"                             #Proxy address username .com             
         $ProxyAddress2        = "$UserName@swarm.co.nz"                           #proxy address username .co.nz
-        $ProxyAddress3        = "$FirstName.$LastName$SuffixValue@swarm.co.nz"    #proxy address first name last name .co.nz
+        $ProxyAddress3        = "$UserPrincipalName"                              #Proxy address username .com
 
     }
 
@@ -64,8 +65,9 @@ function Format-SwarmNamePermanent {
     $UserName       
     $EmailAddress  
     $PrimarySMTP   
+    $UserPrincipalName  
     $ProxyAddress1 
     $ProxyAddress2 
-    $ProxyAddress3  
+    $ProxyAddress3
     
 }
