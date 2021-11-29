@@ -1,4 +1,4 @@
-$Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | Where-Object {$_.Enabled -eq 'True' -and $_.Name -ne "midrisdc02" -and $_.Name -ne "midrissql02" -and $_.Name -ne "midrisapp"} | Select-Object -ExpandProperty Name
+$Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | Where-Object {$_.Enabled -eq 'True'} | Select-Object -ExpandProperty Name
 
 
     $Yesterday = (Get-Date) - (New-TimeSpan -Day 1)
