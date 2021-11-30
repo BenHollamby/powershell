@@ -41,3 +41,69 @@ describe 'Set-File changes the file provided' {
 
 #the beauty of it is that it will clean up after itself and no real world files
 #were changed
+
+<#CONTEXT BLOCK FILE OPERATIONS
+Each context block can be thought
+of as having a child scope of the parent describe block. 
+This scoping means that any files created in the root of a describe block
+are available to each context block, but files created in a context block
+are not available to any other context block in that describe block.
+#>
+
+<#
+Set-File example function
+above and have the function first read the file and then replace a 
+different bit of text depending on the contents of the file.
+#>
+
+function Set-File {
+
+    param(
+    [string]$FilePath
+    )
+
+    $fileContents = Get-Content -Path $FilePath -Raw
+
+    if ($fileContents -match 'foo') {
+
+        $replaceWith = 'bar'
+
+    } else {
+
+    $replaceWith = 'baz'
+
+    }
+
+    $replacement = $fileContents -replace 'foo', $replaceWith
+    Set-Content -Path $FilePath -Value $replacement -NoNewLine
+
+}
+    
+describe 'Set-File changes the file provided' {
+
+    $testFilePath = 'TestDrive:\testFile.txt'
+
+    context 'when the file contains the string foo' {
+
+        Add-Content -Path $testFilePath -Value 'foo bar foo bar' -NoNewLine
+        Set-File -FilePath $testFilePath
+
+        it 'replaces foo with bar' {
+        (Get-Content -Path $testFilePath -Raw) | should -Be 'bar bar bar bar'
+
+        }
+
+    }
+
+    context 'when the file does not contain the string foo' {
+
+        Add-Content -Path $testFilePath -Value 'hi baz hi baz' -NoNewLine
+        Set-File -FilePath $testFilePath
+
+        it 'replaces foo with baz' {
+        (Get-Content -Path $testFilePath -Raw) | should -Be 'hi baz hi baz'
+        }
+
+    }
+
+}
