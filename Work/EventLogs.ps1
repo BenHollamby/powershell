@@ -3,9 +3,9 @@ $Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | W
 
     $Yesterday = (Get-Date) - (New-TimeSpan -Day 1)
 
-    $SystemErrorsTable = @()
-    $SystemWarningsTable = @()
-    $ApplicationErrorsTable = @()
+    $SystemErrorsTable        = @()
+    $SystemWarningsTable      = @()
+    $ApplicationErrorsTable   = @()
     $ApplicationWarningsTable = @()
     
     
@@ -23,10 +23,10 @@ $Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | W
         $ApplicationWarningCount   = $ApplicationWarnings.count
         
         
-        $SystemUniqueErrors        = $SystemErrors   | Select-Object -Unique
-        $SystemUniqueWarnings      = $SystemWarnings | Select-Object -Unique
-        $ApplicationUniqueErrors   = $ApplicationErrors   | Select-Object -Unique
-        $ApplicationUniqueWarnings = $SystemWarnings | Select-Object -Unique
+        $SystemUniqueErrors        = $SystemErrors      | Select-Object -Unique
+        $SystemUniqueWarnings      = $SystemWarnings    | Select-Object -Unique
+        $ApplicationUniqueErrors   = $ApplicationErrors | Select-Object -Unique
+        $ApplicationUniqueWarnings = $SystemWarnings    | Select-Object -Unique
         
         foreach ($SystemUniqueError in $SystemUniqueErrors) {
         
