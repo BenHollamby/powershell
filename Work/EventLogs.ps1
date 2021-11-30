@@ -30,19 +30,19 @@ $Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | W
         
         foreach ($SystemUniqueError in $SystemUniqueErrors) {
         
-            $SystemErrorArray = [PSCustomObject] @{
+            $SystemErrorArray      = [PSCustomObject] @{
 
-                Server         = $Server
-                Time           = $SystemUniqueError.TimeCreated
-                ID             = $SystemUniqueError.ID
-                NumberofEvents = $SystemErrorCount
-                Message        = $SystemUniqueError.Message
-                Type           = "Error"
+                Server             = $Server
+                Time               = $SystemUniqueError.TimeCreated
+                ID                 = $SystemUniqueError.ID
+                NumberofEvents     = $SystemErrorCount
+                Message            = $SystemUniqueError.Message
+                Type               = "Error"
 
 
             }
 
-           $SystemErrorsTable += $SystemErrorArray
+           $SystemErrorsTable      += $SystemErrorArray
 
         }
 
@@ -50,17 +50,17 @@ $Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | W
 
             $SystemWarningArray = [PSCustomObject] @{
 
-                Server         = $Server
-                Time           = $SystemUniqueWarning.TimeCreated
-                ID             = $SystemUniqueWarning.ID
-                NumberofEvents = $SystemWarningCount
-                Message        = $SystemUniqueWarning.Message
-                Type           = "Warning"
+                Server             = $Server
+                Time               = $SystemUniqueWarning.TimeCreated
+                ID                 = $SystemUniqueWarning.ID
+                NumberofEvents     = $SystemWarningCount
+                Message            = $SystemUniqueWarning.Message
+                Type               = "Warning"
 
 
                 }
 
-            $SystemWarningsTable += $SystemWarningArray
+            $SystemWarningsTable   += $SystemWarningArray
 
 
         }
@@ -69,12 +69,12 @@ $Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | W
         
             $ApplicationErrorArray = [PSCustomObject] @{
 
-                Server         = $Server
-                Time           = $ApplicationUniqueError.TimeCreated
-                ID             = $ApplicationUniqueError.ID
-                NumberofEvents = $ApplicationErrorCount
-                Message        = $ApplicationUniqueError.Message
-                Type           = "Error"
+                Server             = $Server
+                Time               = $ApplicationUniqueError.TimeCreated
+                ID                 = $ApplicationUniqueError.ID
+                NumberofEvents     = $ApplicationErrorCount
+                Message            = $ApplicationUniqueError.Message
+                Type               = "Error"
 
 
             }
@@ -87,12 +87,12 @@ $Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | W
 
             $ApplicationWarningArray = [PSCustomObject] @{
 
-                Server         = $Server
-                Time           = $ApplicationUniqueWarning.TimeCreated
-                ID             = $ApplicationUniqueWarning.ID
-                NumberofEvents = $ApplicationWarningCount
-                Message        = $ApplicationUniqueWarning.Message
-                Type           = "Warning"
+                Server             = $Server
+                Time               = $ApplicationUniqueWarning.TimeCreated
+                ID                 = $ApplicationUniqueWarning.ID
+                NumberofEvents     = $ApplicationWarningCount
+                Message            = $ApplicationUniqueWarning.Message
+                Type               = "Warning"
 
 
                 }
@@ -109,19 +109,19 @@ $Servers = Get-ADComputer -Filter {OperatingSystem -like '*Windows Server*'} | W
 Write-Output ''
 Write-Output "SYSTEM ERRORS"
 
-$SystemErrorsTable | ft -AutoSize
+$SystemErrorsTable | Format-Table -AutoSize
 
 Write-Output ''
 Write-Output "SYSTEM WARNINGS"
 
-$SystemWarningsTable | ft -AutoSize
+$SystemWarningsTable | Format-Table -AutoSize
 
 Write-Output ''
 Write-Output "APPLICATION ERRORS"
 
-$ApplicationErrorsTable | ft -AutoSize
+$ApplicationErrorsTable | Format-Table -AutoSize
 
 Write-Output ''
 Write-Output "APPLICATION WARNINGS"
 
-$ApplicationWarningsTable | ft -AutoSize
+$ApplicationWarningsTable | Format-Table -AutoSize
