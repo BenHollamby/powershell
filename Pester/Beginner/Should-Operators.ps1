@@ -158,7 +158,6 @@ Describe 'MatchExactly' {
 
 }
 
-
 #BeTrue
 $var = $true
 
@@ -172,7 +171,6 @@ Describe 'BeTrue' {
 
 }
 
-
 #BeFalse
 $var = $false
 
@@ -183,5 +181,32 @@ Describe 'BeFalse' {
         $var | Should -BeFalse
 
     }
+
+}
+
+$varstring = 'hello'
+$varint = 1
+$varcustom = [pscustomobject]@{Property = 'foo'}
+
+Describe 'BeOfType' {
+
+    It 'tests that object it a type of string' {
+
+        $varstring | Should -BeOfType System.String
+
+    }
+
+    It 'tests that object type is an integer' {
+
+        $varint | Should -BeOfType System.Int32
+
+    }
+
+    It 'tests that object type is a [PSCustomObject]' {
+
+        $varcustom | Should -BeOfType [PSCustomObject]
+
+    }
+
 
 }
