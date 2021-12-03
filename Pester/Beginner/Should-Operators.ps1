@@ -16,6 +16,11 @@
 -BeIn
 -HaveCount
 -BeOfType
+-HaveParameter
+-FileContentMatch           -Removed doesnt work
+-FileContentMatchExactly    -Removed doesnt work
+-FileContentMatchMultiline  -Removed doesnt work
+-Exist
 #>
 
 $variable = 'somevalue'
@@ -240,6 +245,44 @@ Describe 'HaveCount' {
 
 }
 
+$collection = @(
+
+    'red'
+    'green'
+    'yellow'
+
+)
+
+Describe 'Contain' {
+
+    It 'tests if an array contains a particular item' {
+
+        $collection | Should -Contain 'green'
+
+    }
+
+}
+
+Describe 'BeIn' {
+
+    It 'tests if an item is in a particular item' {
+
+        'red' | Should -BeIn $collection
+
+    }
+
+}
+
+Describe 'HaveCount' {
+
+    It 'checks the number of items in an array' {
+
+        $collection | Should -HaveCount 3
+
+    }
+
+}
+
 $varstring = 'hello'
 $varint = 1
 $varcustom = [pscustomobject]@{Property = 'foo'}
@@ -266,3 +309,50 @@ Describe 'BeOfType' {
 
 
 }
+
+
+##### HAVE PARAMETER #####
+function Get-Thing {
+
+    [CmdletBinding()]
+
+    param(
+    
+    [Parameter(Mandatory)]
+    [string]$MyParam
+    
+    )
+
+}
+
+Describe 'HaveParameter' {
+
+    It 'tests whether parameter exists, object type, whether mandatory' {
+
+        Get-Command 'Get-Thing' | Should -HaveParameter 'MyParam' -Type 'string' -Mandatory
+
+    }
+}
+
+function Get-Thing {
+
+    [CmdletBinding()]
+
+    param(
+    
+    [Parameter(Mandatory)]
+    [string]$MyParam = 'defaultvalue'
+    
+    )
+
+}
+
+Describe 'Have Parameter' {
+
+    It 'tests whether parameter exists, object type, and default value' {
+
+        Get-Command 'Get-Thing' | Should -HaveParameter 'MyParam' -Type 'string' -DefaultValue 'defaultvalue'
+
+    }
+}
+
