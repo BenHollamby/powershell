@@ -21,6 +21,8 @@
 -FileContentMatchExactly    -Removed doesnt work
 -FileContentMatchMultiline  -Removed doesnt work
 -Exist
+-Throw
+-Because                    -Add at the end of any should to explain why a test failed
 #>
 
 $variable = 'somevalue'
@@ -354,5 +356,29 @@ Describe 'Have Parameter' {
         Get-Command 'Get-Thing' | Should -HaveParameter 'MyParam' -Type 'string' -DefaultValue 'defaultvalue'
 
     }
+}
+
+
+Describe 'Throw' {
+
+    It 'Tests hard terminating exception error'{
+
+        
+        {Throw "fail"} | Should -Throw 'fail'
+
+    }
+
+    It 'tests exceptions fully qualified error id' {
+
+        {Throw "fail"} | Should -Throw -ErrorId 'fail'
+
+    }
+
+    It 'tests exception type of errror' {
+
+        {throw ([System.NotImplementedException]::new())} | Should -Throw -ExceptionType ([System.NotImplementedException])
+
+    }
+
 }
 
