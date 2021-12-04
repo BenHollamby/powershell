@@ -31,3 +31,44 @@ describe 'Set-Computer' {
     }
 
 }
+
+
+describe 'TestCases' {
+
+    $testCases = @( 
+        
+        @{ ComputerName = 'TESTSRV' }
+        @{ ComputerName = 'CLIESRV' }
+        @{ ComputerName = '1SRV' }
+        @{ ComputerName = '1SRV' }
+
+    )
+
+    It 'tests multiple items against an array of hashtables' -TestCases $testCases {
+
+        param($ComputerName)
+        Set-Computer -ComputerName $ComputerName | Should -Be 'Did that thing to the server'
+
+    }
+
+}
+
+Describe 'TestName' {
+
+    $testCases = @( 
+        
+        @{ ComputerName = 'TESTSRV';    TestName = 'SRV at the end' }
+        @{ ComputerName = 'CLIENT SRV'; TestName = 'space in the name' }
+        @{ ComputerName = '1*SRV';      TestName = 'asterix in the name' }
+        @{ ComputerName = '1SRVSRV';    TestName = 'two iterations of SRV in the name' }
+
+    )
+
+    It 'tests multiple items against an array of hashtables that sets the name of the test: <TestName>' -TestCases $testCases {
+
+        param($ComputerName)
+        Set-Computer -ComputerName $ComputerName | Should -Be 'Did that thing to the server'
+
+    }
+
+}
