@@ -8,26 +8,13 @@ Describe 'Module Manifest Tests' {
     }
 }
 
-Describe 'Format-SwarmName' {
+Describe 'Format-SwarmName' -Tag 'Format-SwarmName' {
 
-   It 'Formats Givenames to the correct format' {
+   It 'Tests for mandatory string Name parameter' {
 
-        $r = "iskaral pust" | Format-SwarmName 
-        $r[4] | Should -BeExactly "Iskaral Pust"
+        Get-Command Format-SwarmName | Should -HaveParameter 'Name' -Type String -Mandatory
 
    }
 
 }
 
-$GivenName
-    $Surname
-    $FirstName
-    $LastName 
-    $DisplayName
-    $Company
-    $UserName
-    $EmailAddress
-    $PrimarySMTP
-    $ProxyAddress1
-    $ProxyAddress2 
-    $ProxyAddress3
