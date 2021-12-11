@@ -76,20 +76,20 @@ Describe 'Tests output of Format-SwarmNameApostrophe Name function' -Tag 'Format
 
     it 'Tests given name' {
 
-        $Objects = Format-SwarmNameApostrophe -Name "anomander r'ake" | Test-FormatNameApostrophe
+        $Objects = Format-SwarmNameApostrophe -Name "sam o'donnell" | Test-FormatNameApostrophe
 
-        $Objects.GivenName     | Should -BeExactly 'Anomander'
-        $Objects.Surname       | Should -BeExactly "R'ake"
-        $Objects.FirstName     | Should -BeExactly 'Anomander'
-        $Objects.LastName      | Should -BeExactly "R'ake"
-        $Objects.EditedLastName | Should -BeExactly 'Rake'
-        $Objects.DisplayName   | Should -BeExactly "Anomander R'ake"
-        $Objects.UserName      | Should -BeExactly 'rakea'
-        $Objects.EmailAddress  | Should -BeExactly "Anomander.R'ake@swarm.com"
-        $Objects.PrimarySMTP   | Should -BeExactly "Anomander.R'ake@swarm.com"
-        $Objects.ProxyAddress1 | Should -BeExactly 'rakea@swarm.com'
-        $Objects.ProxyAddress2 | Should -BeExactly 'rakea@swarm.co.nz'
-        $Objects.ProxyAddress3 | Should -BeExactly "Anomander.R'ake@swarm.co.nz"
+        $Objects.GivenName     | Should -BeExactly 'Sam'
+        $Objects.Surname       | Should -BeExactly "O'Donnell"
+        $Objects.FirstName     | Should -BeExactly 'Sam'
+        $Objects.LastName      | Should -BeExactly "O'Donnell"
+        $Objects.EditedLastName | Should -BeExactly 'ODonnell'
+        $Objects.DisplayName   | Should -BeExactly "Sam O'Donnell"
+        $Objects.UserName      | Should -BeExactly 'odons'
+        $Objects.EmailAddress  | Should -BeExactly "Sam.O'Donnell@swarm.com"
+        $Objects.PrimarySMTP   | Should -BeExactly "Sam.O'Donnell@swarm.com"
+        $Objects.ProxyAddress1 | Should -BeExactly 'odons@swarm.com'
+        $Objects.ProxyAddress2 | Should -BeExactly 'odons@swarm.co.nz'
+        $Objects.ProxyAddress3 | Should -BeExactly "Sam.O'Donnell@swarm.co.nz"
 
     }
 

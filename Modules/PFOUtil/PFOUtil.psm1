@@ -224,19 +224,17 @@ function Format-SwarmNameApostrophe {
         $PrimaryDomain = "@swarm.com"
         $SecondaryDomain = "@swarm.co.nz"
 
-        
+        $Script:FirstName = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[0])
 
-        $Script:GivenName     = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[0]) #Sets variable of full name to titlecase.
-        $Script:Surname       = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[1]) #Sets variable of last name to titlecase.
-        $Script:FirstName     = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[0]) #Sets variable of first name to titlecase. Doubled up so the New-ADUser parameters are clearer.
-        $Script:LastName      = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[1]) #Sets variable of last name to titlecase. Doubled up so the New-ADUser parameters are clearer.
-        $Script:Apostrophe    = $LastName.IndexOf("'")
-        $Script:LastNameSplit    = (Get-Culture).TextInfo.ToTitleCase(($Name -replace "'").Split()[1])
-        $Script:CharacterUpper = $LastNameSplit[$Apostrophe].ToString().ToUpper()
-        $Script:CharacterReplace = $LastNameSplit[$Apostrophe]
-        $Script:EditedLastName = $LastNameSplit -replace "$CharacterReplace","$CharacterUpper"
-        $Script:DisplayName   = (Get-Culture).TextInfo.ToTitleCase($Name)            #Sets variable of displayt name to titlecase.
-        
+        $Script:ApostropheIndex = $Name.Split()[1].IndexOf("'") + 1
+        $Script:PostApostropheCharacterToReplace = ($Name.Split()[1])[$ApostropheIndex]
+        $Script:PostApostropheCharacterReplacement = ($Name.Split()[1])[$ApostropheIndex].ToString().ToUpper()
+        $Script:LastName = ((Get-Culture).TextInfo.ToTitleCase($Name.Split()[1])) -replace "$PostApostropheCharacterToReplace","$PostApostropheCharacterReplacement"
+        $Script:GivenName = "$FirstName"
+        $Script:Surname = $LastName
+        $Script:DisplayName = "$FirstName $LastName"
+        $Script:EditedLastName = $LastName -replace "'"
+
         if ($EditedLastName.Length -eq 3) {                                                #if lastname is less than 3 do
 
             $Length           = $EditedLastName.Length                                     #Gets length of last name  
@@ -245,7 +243,7 @@ function Format-SwarmNameApostrophe {
             
         } #end of lastname equals 3 block
         
-        elseif ($Editedlastname.Length -le 2) {                                            #if name less than or equal to two characters  
+        elseif ($lastname.Length -le 2) {                                            #if name less than or equal to two characters  
         
             $Length           = $EditedLastName.Length                                     #Gets length of last name  
             $LastNameMod      = $EditedLastName.Substring(0,$Length)                       #Gets length number of characters
@@ -268,26 +266,7 @@ function Format-SwarmNameApostrophe {
         $Script:ProxyAddress2 = "$UserName$SecondaryDomain"                          #proxy address username .co.nz
         $Script:ProxyAddress3 = "$FirstName.$LastName$SecondaryDomain"               #proxy address first name last name .co.nz
 
-        $testobject = [PSCustomObject] @{
-
-            GivenName     = $GivenName
-            Surname       = $Surname
-            FirstName     = $FirstName
-            LastName      = $LastName
-            EditedLastName = $EditedLastName 
-            DisplayName   = $DisplayName
-            UserName      = $UserName
-            EmailAddress  = $EmailAddress
-            PrimarySMTP   = $PrimarySMTP
-            ProxyAddress1 = $ProxyAddress1
-            ProxyAddress2 = $ProxyAddress2 
-            ProxyAddress3 = $ProxyAddress3
-    
         }
-    
-        $testobject
-
-    }
 
     END {
 
