@@ -74,7 +74,7 @@ function Clone-HVVM {
         Write-Verbose "Setting VHDX path for Template variable"
         if ($Template -eq "Server2022") {
 
-            $VHDX = 'H:\Server Templates\Server2022Template\Virtual Hard Disks\Server2022Template.vhdx'
+            $VHDX = 'G:\Server Templates\Server2022Template\Virtual Hard Disks\Server2022Template.vhdx'
 
         }
 

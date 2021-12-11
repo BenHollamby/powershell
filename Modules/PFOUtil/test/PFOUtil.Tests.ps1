@@ -50,7 +50,7 @@ Describe 'Tests output of Format-SwarmName' -Tag 'Format-SwarmName' {
 
 }
 
-Describe 'Tests output of Contractor Name function' -Tag 'Format-SwarmNameContractor' {
+Describe 'Tests output of Format-SwarmContractor Name function' -Tag 'Format-SwarmNameContractor' {
 
     it 'Tests given name' {
 
@@ -67,6 +67,29 @@ Describe 'Tests output of Contractor Name function' -Tag 'Format-SwarmNameContra
         $Objects.ProxyAddress1 | Should -BeExactly 'rake_a@swarm.com'
         $Objects.ProxyAddress2 | Should -BeExactly 'rake_a@swarm.co.nz'
         $Objects.ProxyAddress3 | Should -BeExactly 'Anomander.Rake@swarm.co.nz'
+
+    }
+
+}
+
+Describe 'Tests output of Format-SwarmNameApostrophe Name function' -Tag 'Format-SwarmNameApostrophe' {
+
+    it 'Tests given name' {
+
+        $Objects = Format-SwarmNameApostrophe -Name "anomander r'ake" | Test-FormatNameApostrophe
+
+        $Objects.GivenName     | Should -BeExactly 'Anomander'
+        $Objects.Surname       | Should -BeExactly "R'ake"
+        $Objects.FirstName     | Should -BeExactly 'Anomander'
+        $Objects.LastName      | Should -BeExactly "R'ake"
+        $Objects.EditedLastName | Should -BeExactly 'Rake'
+        $Objects.DisplayName   | Should -BeExactly "Anomander R'ake"
+        $Objects.UserName      | Should -BeExactly 'rakea'
+        $Objects.EmailAddress  | Should -BeExactly "Anomander.R'ake@swarm.com"
+        $Objects.PrimarySMTP   | Should -BeExactly "Anomander.R'ake@swarm.com"
+        $Objects.ProxyAddress1 | Should -BeExactly 'rakea@swarm.com'
+        $Objects.ProxyAddress2 | Should -BeExactly 'rakea@swarm.co.nz'
+        $Objects.ProxyAddress3 | Should -BeExactly "Anomander.R'ake@swarm.co.nz"
 
     }
 
