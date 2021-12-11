@@ -201,6 +201,7 @@ function Test-FormatNameContractor {
 
 }
 
+
 function Format-SwarmNameApostrophe {
 
     [cmdletbinding()]
@@ -229,7 +230,11 @@ function Format-SwarmNameApostrophe {
         $Script:Surname       = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[1]) #Sets variable of last name to titlecase.
         $Script:FirstName     = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[0]) #Sets variable of first name to titlecase. Doubled up so the New-ADUser parameters are clearer.
         $Script:LastName      = (Get-Culture).TextInfo.ToTitleCase($Name.Split()[1]) #Sets variable of last name to titlecase. Doubled up so the New-ADUser parameters are clearer.
-        $Script:EditedLastName    = (Get-Culture).TextInfo.ToTitleCase(($Name -replace "'").Split()[1])
+        $Script:Apostrophe    = $LastName.IndexOf("'")
+        $Script:LastNameSplit    = (Get-Culture).TextInfo.ToTitleCase(($Name -replace "'").Split()[1])
+        $Script:CharacterUpper = $LastNameSplit[$Apostrophe].ToString().ToUpper()
+        $Script:CharacterReplace = $LastNameSplit[$Apostrophe]
+        $Script:EditedLastName = $LastNameSplit -replace "$CharacterReplace","$CharacterUpper"
         $Script:DisplayName   = (Get-Culture).TextInfo.ToTitleCase($Name)            #Sets variable of displayt name to titlecase.
         
         if ($EditedLastName.Length -eq 3) {                                                #if lastname is less than 3 do
